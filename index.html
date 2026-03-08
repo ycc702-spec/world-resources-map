@@ -91,6 +91,33 @@
         </div>
     </header>
 
+    <!-- Data Sources Banner -->
+    <div class="bg-slate-800/50 border-b border-slate-700">
+        <div class="max-w-7xl mx-auto px-4 py-3">
+            <div class="flex flex-wrap items-center gap-4 text-sm">
+                <div class="flex items-center gap-2 text-slate-300">
+                    <span class="text-blue-400">📊</span>
+                    <span class="font-medium">資料來源：</span>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <a href="https://www.energyinst.org/statistical-review" target="_blank" rel="noopener" class="px-3 py-1 bg-slate-700/50 hover:bg-slate-700 rounded-full text-slate-300 hover:text-white transition text-xs flex items-center gap-1">
+                        <span>🛢️</span> BP Statistical Review 2024
+                    </a>
+                    <a href="https://www.usgs.gov/centers/national-minerals-information-center" target="_blank" rel="noopener" class="px-3 py-1 bg-slate-700/50 hover:bg-slate-700 rounded-full text-slate-300 hover:text-white transition text-xs flex items-center gap-1">
+                        <span>⛏️</span> USGS Mineral Commodity Summaries 2025
+                    </a>
+                    <a href="https://www.iea.org/reports/world-energy-outlook-2024" target="_blank" rel="noopener" class="px-3 py-1 bg-slate-700/50 hover:bg-slate-700 rounded-full text-slate-300 hover:text-white transition text-xs flex items-center gap-1">
+                        <span>🔋</span> IEA World Energy Outlook 2024
+                    </a>
+                </div>
+                <div class="ml-auto flex items-center gap-2 text-xs text-slate-400">
+                    <span>🕒</span>
+                    <span>資料更新於 2025年3月</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Resource Type Filter -->
     <div class="max-w-7xl mx-auto px-4 py-6">
         <div class="glass-panel rounded-2xl p-6 mb-6">
@@ -364,9 +391,12 @@
             'Venezuela': {
                 name: '委內瑞拉',
                 resources: ['oil'],
-                oilReserves: '17.5%',
+                oilReserves: '303.2',
+                oilReservesUnit: '十億桶',
+                oilReservesGlobal: '19.3%',
+                dataYear: '2024',
                 mainExports: ['中國', '印度', '新加坡', '西班牙'],
-                description: '全球最大石油儲量國（重油）',
+                description: '全球最大石油儲量國（2024年BP數據），但受制裁影響生產',
                 color: '#dc2626'
             },
             
