@@ -262,27 +262,42 @@
             'Saudi Arabia': {
                 name: '沙烏地阿拉伯',
                 resources: ['oil', 'gas'],
-                oilReserves: '17.2%',
-                gasReserves: '4.5%',
-                mainExports: ['中國', '日本', '印度', '美國', '韓國'],
-                description: '全球最大石油出口國，OPEC核心成員',
+                oilReserves: '267.2',
+                oilReservesUnit: '十億桶',
+                oilReservesGlobal: '17.0%',
+                gasReserves: '9.2',
+                gasReservesUnit: '兆立方英尺',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
+                mainExports: ['中國', '日本', '印度', '韓國', '美國'],
+                description: '全球第二大石油儲量國，OPEC核心成員',
                 color: '#dc2626'
             },
             'Iran': {
                 name: '伊朗',
                 resources: ['oil', 'gas'],
-                oilReserves: '9.1%',
-                gasReserves: '15.3%',
+                oilReserves: '208.6',
+                oilReservesUnit: '十億桶',
+                oilReservesGlobal: '13.3%',
+                gasReserves: '34.0',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '17.3%',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
                 mainExports: ['中國', '印度', '土耳其', '韓國'],
-                description: '全球第二大天然氣儲量國',
+                description: '全球第二大天然氣儲量國，第三大石油儲量國',
                 color: '#dc2626'
             },
             'Iraq': {
                 name: '伊拉克',
                 resources: ['oil'],
-                oilReserves: '8.4%',
+                oilReserves: '145.0',
+                oilReservesUnit: '十億桶',
+                oilReservesGlobal: '9.2%',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
                 mainExports: ['中國', '印度', '美國', '韓國', '義大利'],
-                description: '中東重要石油生產國',
+                description: '中東重要石油生產國，儲量全球第5',
                 color: '#dc2626'
             },
             'Kuwait': {
@@ -314,11 +329,16 @@
             'Russia': {
                 name: '俄羅斯',
                 resources: ['oil', 'gas', 'coal', 'mineral'],
-                oilReserves: '6.2%',
-                gasReserves: '19.9%',
-                coalReserves: '15.1%',
+                oilReserves: '80.0',
+                oilReservesUnit: '十億桶',
+                oilReservesGlobal: '5.1%',
+                gasReserves: '47.7',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '24.2%',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
                 mainExports: ['中國', '德國', '荷蘭', '白俄羅斯', '土耳其'],
-                description: '全球最大天然氣出口國，重要石油和煤炭生產國',
+                description: '全球最大天然氣出口國，天然氣儲量全球第1',
                 color: '#7c3aed'
             },
             
@@ -338,21 +358,30 @@
             'China': {
                 name: '中國',
                 resources: ['rare', 'coal', 'mineral'],
-                rareEarthReserves: '37.8%',
+                rareEarthReserves: '44',
+                rareEarthReservesUnit: '百萬噸（REO）',
+                rareEarthReservesGlobal: '51.8%',
                 coalReserves: '13.3%',
+                dataYear: '2025',
+                dataSource: 'USGS Mineral Commodity Summaries 2025',
                 mainExports: ['日本', '美國', '德國', '韓國', '荷蘭'],
-                description: '全球稀土儲量和產量第一大國',
+                description: '全球稀土儲量和產量第一大國，掌控全球90%加工能力',
                 color: '#06b6d4'
             },
             
             // Australia - Iron, Coal, Gold, LNG
             'Australia': {
                 name: '澳洲',
-                resources: ['mineral', 'coal', 'gold', 'gas'],
+                resources: ['mineral', 'coal', 'gold', 'gas', 'lithium'],
                 ironOreReserves: '28.5%',
+                lithiumReserves: '620',
+                lithiumReservesUnit: '萬噸',
+                lithiumReservesGlobal: '20.7%',
                 coalReserves: '14.0%',
+                dataYear: '2025',
+                dataSource: 'USGS Mineral Commodity Summaries 2025',
                 mainExports: ['中國', '日本', '韓國', '印度', '台灣'],
-                description: '全球最大鐵礦石出口國，重要LNG供應國',
+                description: '全球最大鐵礦石出口國，鋰礦儲量全球第2',
                 color: '#eab308'
             },
             
@@ -381,9 +410,13 @@
             'Canada': {
                 name: '加拿大',
                 resources: ['oil', 'lumber', 'mineral'],
-                oilReserves: '10.0%',
+                oilReserves: '163.0',
+                oilReservesUnit: '十億桶',
+                oilReservesGlobal: '10.4%',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
                 mainExports: ['美國', '中國', '英國', '日本', '墨西哥'],
-                description: '油砂資源豐富，重要木材出口國',
+                description: '油砂資源豐富，石油儲量全球第4',
                 color: '#dc2626'
             },
             
@@ -403,10 +436,15 @@
             // Chile - Copper
             'Chile': {
                 name: '智利',
-                resources: ['mineral'],
+                resources: ['mineral', 'lithium'],
                 copperReserves: '23.0%',
+                lithiumReserves: '930',
+                lithiumReservesUnit: '萬噸',
+                lithiumReservesGlobal: '31.0%',
+                dataYear: '2025',
+                dataSource: 'USGS Mineral Commodity Summaries 2025',
                 mainExports: ['中國', '日本', '美國', '巴西', '韓國'],
-                description: '全球最大銅礦生產國',
+                description: '全球最大銅礦生產國，鋰礦儲量全球第1',
                 color: '#7c3aed'
             },
             
@@ -555,7 +593,11 @@
             'Argentina': {
                 name: '阿根廷',
                 resources: ['lithium', 'gas', 'oil'],
-                lithiumReserves: '21.0%',
+                lithiumReserves: '360',
+                lithiumReservesUnit: '萬噸',
+                lithiumReservesGlobal: '12.0%',
+                dataYear: '2025',
+                dataSource: 'USGS Mineral Commodity Summaries 2025',
                 mainExports: ['中國', '日本', '韓國', '美國', '德國'],
                 description: '南美鋰三角之一，重要鋰礦產國',
                 color: '#14b8a6'
@@ -565,9 +607,13 @@
             'Bolivia': {
                 name: '玻利維亞',
                 resources: ['lithium', 'silver'],
-                lithiumReserves: '23.0%',
+                lithiumReserves: '2,300',
+                lithiumReservesUnit: '萬噸',
+                lithiumReservesGlobal: '7.7%',
+                dataYear: '2025',
+                dataSource: 'USGS Mineral Commodity Summaries 2025',
                 mainExports: ['中國', '巴西', '阿根廷', '美國'],
-                description: '全球最大鋰儲量國（烏尤尼鹽沼）',
+                description: '烏尤尼鹽沼鋰礦儲量豐富，南美鋰三角之一',
                 color: '#14b8a6'
             },
             
