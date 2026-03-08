@@ -303,25 +303,40 @@
             'Kuwait': {
                 name: '科威特',
                 resources: ['oil'],
-                oilReserves: '5.9%',
+                oilReserves: '101.5',
+                oilReservesUnit: '十億桶',
+                oilReservesGlobal: '6.5%',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
                 mainExports: ['中國', '日本', '印度', '韓國', '新加坡'],
-                description: '石油儲量豐富的小型國家',
+                description: '石油儲量全球第6，人均儲量極高',
                 color: '#dc2626'
             },
             'UAE': {
                 name: '阿拉伯聯合大公國',
                 resources: ['oil', 'gas'],
-                oilReserves: '5.7%',
+                oilReserves: '113.0',
+                oilReservesUnit: '十億桶',
+                oilReservesGlobal: '7.2%',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
                 mainExports: ['日本', '印度', '中國', '新加坡', '泰國'],
-                description: '多元化經濟的石油出口國',
+                description: '石油儲量全球第7，多元化經濟的石油出口國',
                 color: '#dc2626'
             },
             'Qatar': {
                 name: '卡達',
                 resources: ['gas', 'oil'],
-                gasReserves: '13.1%',
+                gasReserves: '24.9',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '12.6%',
+                oilReserves: '25.2',
+                oilReservesUnit: '十億桶',
+                oilReservesGlobal: '1.6%',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
                 mainExports: ['日本', '韓國', '印度', '中國', '英國'],
-                description: '全球最大LNG出口國',
+                description: '全球第3大天然氣儲量國，最大LNG出口國',
                 color: '#f59e0b'
             },
             
@@ -346,11 +361,16 @@
             'United States': {
                 name: '美國',
                 resources: ['oil', 'gas', 'coal'],
-                oilReserves: '3.8%',
-                gasReserves: '5.3%',
-                coalReserves: '22.1%',
+                oilReserves: '45.0',
+                oilReservesUnit: '十億桶',
+                oilReservesGlobal: '2.9%',
+                gasReserves: '17.5',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '8.9%',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
                 mainExports: ['加拿大', '墨西哥', '中國', '日本', '韓國'],
-                description: '全球最大石油生產國，頁岩油氣革命領導者',
+                description: '全球最大石油生產國（頁岩革命），第9大儲量國',
                 color: '#7c3aed'
             },
             
@@ -388,8 +408,13 @@
             // Brazil - Iron, Lumber
             'Brazil': {
                 name: '巴西',
-                resources: ['mineral', 'lumber'],
+                resources: ['mineral', 'lumber', 'oil'],
                 ironOreReserves: '18.9%',
+                oilReserves: '12.7',
+                oilReservesUnit: '十億桶',
+                oilReservesGlobal: '0.8%',
+                dataYear: '2024/2025',
+                dataSource: 'BP Statistical Review 2024 / USGS 2025',
                 mainExports: ['中國', '日本', '荷蘭', '韓國', '德國'],
                 description: '全球第二大鐵礦石出口國，亞馬遜雨林木材',
                 color: '#22c55e'
@@ -399,10 +424,13 @@
             'South Africa': {
                 name: '南非',
                 resources: ['gold', 'diamond', 'coal', 'mineral'],
-                goldReserves: '12.8%',
+                goldReserves: '5,000',
+                goldReservesUnit: '噸',
                 platinumReserves: '90%+',
+                dataYear: '2025',
+                dataSource: 'USGS Mineral Commodity Summaries 2025',
                 mainExports: ['中國', '美國', '德國', '日本', '印度'],
-                description: '全球重要黃金、白金、鑽石產國',
+                description: '全球重要黃金、白金、鑽石產國，白金儲量占全球90%+',
                 color: '#eab308'
             },
             
@@ -453,8 +481,12 @@
                 name: '秘魯',
                 resources: ['mineral', 'gold'],
                 copperReserves: '11.0%',
+                goldReserves: '2,400',
+                goldReservesUnit: '噸',
+                dataYear: '2025',
+                dataSource: 'USGS Mineral Commodity Summaries 2025',
                 mainExports: ['中國', '美國', '日本', '韓國', '加拿大'],
-                description: '全球第二大銅礦生產國',
+                description: '全球第二大銅礦生產國，重要金礦產國',
                 color: '#eab308'
             },
             
@@ -471,10 +503,15 @@
             // Indonesia - Coal, LNG, Palm Oil
             'Indonesia': {
                 name: '印尼',
-                resources: ['coal', 'gas'],
+                resources: ['coal', 'gas', 'nickel'],
                 coalReserves: '3.5%',
+                nickelReserves: '2,100',
+                nickelReservesUnit: '萬噸',
+                nickelReservesGlobal: '22.0%',
+                dataYear: '2025',
+                dataSource: 'USGS Mineral Commodity Summaries 2025',
                 mainExports: ['中國', '印度', '日本', '韓國', '馬來西亞'],
-                description: '全球最大動力煤出口國，重要LNG供應國',
+                description: '全球最大動力煤出口國，鎳礦儲量全球第1（電池原料）',
                 color: '#374151'
             },
             
@@ -503,9 +540,13 @@
             'Nigeria': {
                 name: '奈及利亞',
                 resources: ['oil'],
-                oilReserves: '2.1%',
+                oilReserves: '37.3',
+                oilReservesUnit: '十億桶',
+                oilReservesGlobal: '2.4%',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
                 mainExports: ['印度', '西班牙', '荷蘭', '美國', '南非'],
-                description: '非洲最大石油生產國',
+                description: '非洲最大石油生產國，儲量全球第10',
                 color: '#dc2626'
             },
             
@@ -513,9 +554,13 @@
             'Libya': {
                 name: '利比亞',
                 resources: ['oil'],
-                oilReserves: '2.9%',
+                oilReserves: '48.4',
+                oilReservesUnit: '十億桶',
+                oilReservesGlobal: '3.1%',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
                 mainExports: ['義大利', '德國', '西班牙', '法國', '中國'],
-                description: '北非重要石油出口國',
+                description: '北非重要石油出口國，石油儲量全球第9',
                 color: '#dc2626'
             },
             
@@ -533,19 +578,26 @@
             'Botswana': {
                 name: '波札那',
                 resources: ['diamond'],
-                diamondReserves: '20%+',
+                diamondReserves: '重大',
+                diamondReservesGlobal: '20%+',
+                dataYear: '2025',
+                dataSource: 'USGS Mineral Commodity Summaries 2025',
                 mainExports: ['比利時', '印度', '阿聯', '新加坡', '以色列'],
-                description: '全球重要鑽石產國',
+                description: '全球重要鑽石產國，品質極佳',
                 color: '#ec4899'
             },
             
             // Democratic Republic of Congo - Cobalt, Diamond
             'Democratic Republic of the Congo': {
                 name: '剛果民主共和國',
-                resources: ['mineral', 'diamond'],
-                cobaltReserves: '50%+',
+                resources: ['mineral', 'diamond', 'cobalt'],
+                cobaltReserves: '600',
+                cobaltReservesUnit: '萬噸',
+                cobaltReservesGlobal: '55.0%',
+                dataYear: '2025',
+                dataSource: 'USGS Mineral Commodity Summaries 2025',
                 mainExports: ['中國', '新加坡', '阿聯', '南非', '坦尚尼亞'],
-                description: '全球鈷礦最大產國（電池原料）',
+                description: '全球鈷礦最大產國（占55%，電池原料關鍵）',
                 color: '#ec4899'
             },
             
@@ -631,9 +683,15 @@
             'Mexico': {
                 name: '墨西哥',
                 resources: ['silver', 'oil', 'gold'],
-                silverReserves: '18.0%',
+                silverReserves: '37,000',
+                silverReservesUnit: '噸',
+                silverReservesGlobal: '18.0%',
+                oilReserves: '5.8',
+                oilReservesUnit: '十億桶',
+                dataYear: '2024/2025',
+                dataSource: 'BP 2024 / USGS 2025',
                 mainExports: ['美國', '加拿大', '中國', '西班牙'],
-                description: '全球重要白銀生產國',
+                description: '全球重要白銀生產國（儲量第1），新興石油產國',
                 color: '#94a3b8'
             },
             
@@ -661,9 +719,13 @@
             'Turkey': {
                 name: '土耳其',
                 resources: ['mineral'],
-                boronReserves: '73.0%',
+                boronReserves: '11.0',
+                boronReservesUnit: '億噸',
+                boronReservesGlobal: '73.0%',
+                dataYear: '2025',
+                dataSource: 'USGS Mineral Commodity Summaries 2025',
                 mainExports: ['中國', '美國', '歐洲', '日本'],
-                description: '全球硼礦儲量第一大國',
+                description: '全球硼礦儲量第一大國（73%）',
                 color: '#7c3aed'
             },
             
@@ -682,6 +744,9 @@
                 name: '蒙古',
                 resources: ['mineral', 'coal', 'rare'],
                 copperReserves: 'Oyu Tolgoi大型礦區',
+                coalReserves: '豐富',
+                dataYear: '2025',
+                dataSource: 'USGS Mineral Commodity Summaries 2025',
                 mainExports: ['中國', '俄羅斯'],
                 description: '夾在中俄之間的資源大國，銅煤稀土豐富',
                 color: '#7c3aed'
@@ -731,9 +796,13 @@
             'Philippines': {
                 name: '菲律賓',
                 resources: ['mineral', 'gold', 'nickel'],
-                nickelReserves: '4.8%',
+                nickelReserves: '480',
+                nickelReservesUnit: '萬噸',
+                nickelReservesGlobal: '5.0%',
+                dataYear: '2025',
+                dataSource: 'USGS Mineral Commodity Summaries 2025',
                 mainExports: ['中國', '日本', '韓國', '美國'],
-                description: '全球重要鎳礦生產國（電池原料）',
+                description: '全球重要鎳礦生產國（電池原料），儲量全球第5',
                 color: '#7c3aed'
             },
             
@@ -832,6 +901,8 @@
                 name: '尚比亞',
                 resources: ['mineral'],
                 copperReserves: '6.0%',
+                dataYear: '2025',
+                dataSource: 'USGS Mineral Commodity Summaries 2025',
                 mainExports: ['瑞士', '中國', '剛果', '新加坡'],
                 description: '非洲第二大銅礦生產國',
                 color: '#7c3aed'
@@ -842,6 +913,9 @@
                 name: '辛巴威',
                 resources: ['mineral', 'diamond', 'lithium'],
                 platinumReserves: '重要產區',
+                lithiumReserves: '新發現大型礦區',
+                dataYear: '2025',
+                dataSource: 'USGS Mineral Commodity Summaries 2025',
                 mainExports: ['中國', '南非', '阿聯', '比利時'],
                 description: '非洲重要白金和鑽石產國，新發現大型鋰礦',
                 color: '#ec4899'
@@ -941,9 +1015,13 @@
             'Morocco': {
                 name: '摩洛哥',
                 resources: ['mineral'],
-                phosphateReserves: '70.0%',
+                phosphateReserves: '500',
+                phosphateReservesUnit: '億噸',
+                phosphateReservesGlobal: '70.0%',
+                dataYear: '2025',
+                dataSource: 'USGS Mineral Commodity Summaries 2025',
                 mainExports: ['印度', '巴西', '美國', '印尼'],
-                description: '全球磷酸鹽儲量第一大國（化肥原料）',
+                description: '全球磷酸鹽儲量第一大國（70%，化肥原料）',
                 color: '#7c3aed'
             },
             
@@ -961,7 +1039,11 @@
             'Egypt': {
                 name: '埃及',
                 resources: ['gas', 'mineral'],
-                gasReserves: '1.8%',
+                gasReserves: '2.1',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '1.1%',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
                 mainExports: ['義大利', '土耳其', '西班牙', '約旦'],
                 description: '北非重要天然氣生產國，Zohr氣田',
                 color: '#f59e0b'
