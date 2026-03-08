@@ -1298,8 +1298,9 @@
                     icon: '🛢️',
                     color: 'red',
                     countries: ['沙烏地阿拉伯', '伊朗', '伊拉克', '科威特', '阿聯', '卡達'],
-                    stats: '全球55%石油儲量',
-                    exports: '中國、日本、印度、歐美'
+                    stats: '全球55%石油儲量、45%天然氣',
+                    exports: '石油→中國(25%)、日本(15%)、印度(12%)、韓國(10%)、美國(8%)',
+                    details: 'OPEC核心產區，霍爾木茲海峽是全球能源運輸咽喉'
                 },
                 {
                     title: '俄羅斯 - 能源巨人',
@@ -1307,15 +1308,17 @@
                     color: 'purple',
                     countries: ['俄羅斯'],
                     stats: '20%天然氣、6%石油、15%煤炭',
-                    exports: '歐洲、中國、土耳其'
+                    exports: '天然氣→德國/義大利/土耳其(管道) | 石油→中國/印度/歐洲 | 煤炭→中國/韓國',
+                    details: '全球最大天然氣出口國，歐洲能源依賴度高(戰前40%天然氣來自俄羅斯)'
                 },
                 {
                     title: '北美 - 頁岩革命',
                     icon: '📈',
                     color: 'blue',
                     countries: ['美國', '加拿大'],
-                    stats: '全球最大石油生產國、油砂資源',
-                    exports: '亞洲、歐洲、美洲'
+                    stats: '全球最大石油生產國、油砂資源豐富',
+                    exports: '美國石油→加拿大/墨西哥/中國/日本 | 加拿大油砂→美國(95%) | LNG→歐洲/亞洲',
+                    details: '頁岩油氣革命使美國從進口國變成出口國，改變全球能源格局'
                 },
                 {
                     title: '澳洲 - 礦業大國',
@@ -1323,31 +1326,35 @@
                     color: 'yellow',
                     countries: ['澳洲'],
                     stats: '29%鐵礦石、14%煤炭、重要LNG',
-                    exports: '中國、日本、韓國、印度'
+                    exports: '鐵礦石→中國(60%+)、日本、韓國 | 煤炭→日本/印度/韓國 | LNG→中日韓台',
+                    details: '全球最大鐵礦石出口國，中國鋼鐵業命脈所繫'
                 },
                 {
-                    title: '南美 - 鐵礦與雨林',
+                    title: '南美 - 鐵礦與鋰三角',
                     icon: '🌲',
                     color: 'green',
-                    countries: ['巴西', '智利', '秘魯'],
-                    stats: '19%鐵礦石、34%銅礦、亞馬遜木材',
-                    exports: '中國、歐洲、北美'
+                    countries: ['巴西', '智利', '秘魯', '阿根廷', '玻利維亞'],
+                    stats: '19%鐵礦石、34%銅礦、85%鋰礦、亞馬遜木材',
+                    exports: '鐵礦石→中國 | 銅礦→中國 | 鋰礦→中國加工→全球電池 | 木材→歐洲/北美',
+                    details: '智利、阿根廷、玻利維亞組成「鋰三角」，掌控電動車電池原料命脈'
                 },
                 {
                     title: '非洲 - 貴金屬與能源',
                     icon: '💎',
                     color: 'pink',
-                    countries: ['南非', '波札那', '剛果', '奈及利亞'],
-                    stats: '黃金、鑽石、鈷礦、石油',
-                    exports: '中國、歐洲、印度、美國'
+                    countries: ['南非', '波札那', '剛果', '奈及利亞', '迦納', '尚比亞'],
+                    stats: '黃金、鑽石、鈷礦(70%)、石油、銅礦',
+                    exports: '黃金→瑞士(冶煉)→印度/中國 | 鑽石→比利時(安特衛普)→印度加工 | 鈷礦→中國(電池) | 石油→中國/歐洲',
+                    details: '剛果鈷礦是電動車電池關鍵原料，波札那鑽石品質全球最佳'
                 },
                 {
                     title: '中國 - 稀土之王',
                     icon: '🔋',
                     color: 'cyan',
                     countries: ['中國'],
-                    stats: '38%稀土、13%煤炭、多種礦產',
-                    exports: '日本、美國、歐洲、韓國'
+                    stats: '38%稀土、13%煤炭、多種礦產加工',
+                    exports: '稀土→日本(30%)、美國(25%)、歐洲(20%)、韓國(15%) | 加工礦產→全球',
+                    details: '稀土儲量第一，更掌控全球90%稀土加工能力，戰略地位無可替代'
                 },
                 {
                     title: '北歐 - 北海油田',
@@ -1355,15 +1362,44 @@
                     color: 'orange',
                     countries: ['挪威', '英國'],
                     stats: '西歐石油、天然氣供應基地',
-                    exports: '歐洲各國'
+                    exports: '挪威石油/天然氣→德國/英國/法國/荷蘭 | 英國石油→歐洲/美國',
+                    details: '北海油田支撐歐洲能源安全，挪威是歐洲最大天然氣供應國(替代俄羅斯)'
                 },
                 {
                     title: '中亞 - 新興能源走廊',
                     icon: '🚢',
                     color: 'indigo',
-                    countries: ['哈薩克', '土庫曼'],
-                    stats: '石油、天然氣、鈾礦',
-                    exports: '中國、歐洲、俄羅斯'
+                    countries: ['哈薩克', '土庫曼', '烏茲別克'],
+                    stats: '石油、天然氣、鈾礦、黃金',
+                    exports: '哈薩克石油→中國(管道)/歐洲 | 土庫曼天然氣→中國/俄羅斯 | 鈾礦→歐洲/中國/美國',
+                    details: '一帶一路能源樞紐，中國-中亞油氣管道繞過麻六甲海峽'
+                },
+                {
+                    title: '東南亞 - 鎳礦與煤炭',
+                    icon: '⚙️',
+                    color: 'indigo',
+                    countries: ['印尼', '菲律賓', '越南', '緬甸'],
+                    stats: '全球30%鎳礦、最大動力煤出口',
+                    exports: '印尼鎳礦→中國(不鏽鋼/電池) | 菲律賓鎳礦→中國 | 煤炭→中國/印度/日本 | 稀土→中國',
+                    details: '印尼鎳礦出口禁令推動中國企業當地建廠，電池產業鏈重組'
+                },
+                {
+                    title: '加勒比海與南美新興',
+                    icon: '🛢️',
+                    color: 'red',
+                    countries: ['蓋亞那', '蘇利南', '古巴', '多明尼加'],
+                    stats: '新發現110億桶石油、鋁土礦、鎳鈷礦',
+                    exports: '蓋亞那石油→美國(ExxonMobil開發) | 古巴鎳礦→中國 | 多明尼加金礦→美國/加拿大',
+                    details: '蓋亞那2015年發現石油，人均產量將超越科威特，成為全球新富國'
+                },
+                {
+                    title: '北非 - 磷酸鹽與天然氣',
+                    icon: '🧪',
+                    color: 'orange',
+                    countries: ['摩洛哥', '突尼西亞', '埃及', '阿爾及利亞'],
+                    stats: '摩洛哥70%全球磷酸鹽、埃及Zohr氣田',
+                    exports: '摩洛哥磷酸鹽→印度(化肥)/巴西/歐洲 | 埃及天然氣→義大利/土耳其 | 阿爾及利亞天然氣→歐洲',
+                    details: '摩洛哥掌控全球磷酸鹽命脈，攸關全球糧食安全；埃及Zohr氣田改變東地中海能源版圖'
                 }
             ];
             
@@ -1397,9 +1433,14 @@
                                 <p class="text-sm font-semibold text-white mt-1">${region.stats}</p>
                             </div>
                             <div>
-                                <span class="text-xs text-slate-400 uppercase tracking-wider">主要出口至</span>
-                                <p class="text-sm text-slate-300 mt-1">${region.exports}</p>
+                                <span class="text-xs text-slate-400 uppercase tracking-wider">主要出口流向</span>
+                                <p class="text-sm text-slate-300 mt-1 leading-relaxed">${region.exports}</p>
                             </div>
+                            ${region.details ? `
+                            <div class="pt-2 border-t border-slate-700/50">
+                                <p class="text-xs text-slate-400 italic">💡 ${region.details}</p>
+                            </div>
+                            ` : ''}
                         </div>
                     </div>
                 </div>
