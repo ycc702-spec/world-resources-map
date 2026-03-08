@@ -1111,32 +1111,45 @@
             const path = d3.geoPath().projection(projection);
             
             // Load world data
-            d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(world => {
-                const countries = topojson.feature(world, world.objects.countries);
-                
-                // Draw countries
-                svg.selectAll('path')
-                    .data(countries.features)
-                    .enter()
-                    .append('path')
-                    .attr('class', 'country-path')
-                    .attr('d', path)
-                    .attr('fill', d => getCountryColor(d.properties.name))
-                    .attr('stroke', '#1e293b')
-                    .attr('stroke-width', 0.5)
-                    .on('click', (event, d) => showCountryDetails(d.properties.name))
-                    .on('mouseover', function(event, d) {
-                        d3.select(this).attr('opacity', 0.8);
-                        showTooltip(event, d.properties.name);
-                    })
-                    .on('mouseout', function() {
-                        d3.select(this).attr('opacity', 1);
-                        hideTooltip();
-                    });
-                
-                // Add resource markers
-                addResourceMarkers(svg, projection);
-            });
+            d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+                .then(world => {
+                    const countries = topojson.feature(world, world.objects.countries);
+                    
+                    // Draw countries
+                    svg.selectAll('path')
+                        .data(countries.features)
+                        .enter()
+                        .append('path')
+                        .attr('class', 'country-path')
+                        .attr('d', path)
+                        .attr('fill', d => getCountryColor(d.properties.name))
+                        .attr('stroke', '#1e293b')
+                        .attr('stroke-width', 0.5)
+                        .on('click', (event, d) => showCountryDetails(d.properties.name))
+                        .on('mouseover', function(event, d) {
+                            d3.select(this).attr('opacity', 0.8);
+                            showTooltip(event, d.properties.name);
+                        })
+                        .on('mouseout', function() {
+                            d3.select(this).attr('opacity', 1);
+                            hideTooltip();
+                        });
+                    
+                    // Add resource markers
+                    addResourceMarkers(svg, projection);
+                })
+                .catch(error => {
+                    console.error('Error loading map data:', error);
+                    document.getElementById('map-container').innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #94a3b8; text-align: center; padding: 20px;">
+                            <div>
+                                <div style="font-size: 3rem; margin-bottom: 1rem;">🗺️</div>
+                                <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">地圖載入中...</div>
+                                <div style="font-size: 0.9rem; opacity: 0.7;">如果持續無法顯示，請檢查網路連線或重新整理頁面</div>
+                            </div>
+                        </div>
+                    `;
+                });
         }
 
         function getCountryColor(countryName) {
