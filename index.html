@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌍 全球天然資源地圖 | World Natural Resources Map</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .resource-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .resource-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        .country-path {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .country-path:hover {
+            filter: brightness(1.2);
+        }
+        .pulse-ring {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .oil-gradient { background: linear-gradient(135deg, #dc2626, #991b1b); }
+        .gas-gradient { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .coal-gradient { background: linear-gradient(135deg, #374151, #1f2937); }
+        .mineral-gradient { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
+        .rare-gradient { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+        .gold-gradient { background: linear-gradient(135deg, #eab308, #ca8a04); }
+        .diamond-gradient { background: linear-gradient(135deg, #ec4899, #db2777); }
+        .lumber-gradient { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .lithium-gradient { background: linear-gradient(135deg, #14b8a6, #0d9488); }
+        .silver-gradient { background: linear-gradient(135deg, #94a3b8, #64748b); }
+        .nickel-gradient { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+        .phosphate-gradient { background: linear-gradient(135deg, #f97316, #ea580c); }
+        .tooltip {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            pointer-events: none;
+            z-index: 1000;
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body class="text-white">
+    <!-- Header -->
+    <header class="glass-panel sticky top-0 z-50 border-b border-slate-700">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">🌍</span>
+                    <div>
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                            全球天然資源地圖
+                        </h1>
+                        <p class="text-sm text-slate-400">World Natural Resources Map 2025</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="showAllResources()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition">
+                        顯示全部
+                    </button>
+                    <button onclick="resetView()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition">
+                        重置視圖
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Resource Type Filter -->
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        <div class="glass-panel rounded-2xl p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                <span>🏷️</span> 資源類型篩選
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-11 gap-3">
+                <button onclick="filterResource('oil')" class="resource-card oil-gradient rounded-xl p-3 text-center">
+                    <div class="text-2xl mb-1">🛢️</div>
+                    <div class="text-sm font-medium">石油</div>
+                    <div class="text-xs text-white/70">Oil</div>
+                </button>
+                <button onclick="filterResource('gas')" class="resource-card gas-gradient rounded-xl p-3 text-center">
+                    <div class="text-2xl mb-1">🔥</div>
+                    <div class="text-sm font-medium">天然氣</div>
+                    <div class="text-xs text-white/70">Natural Gas</div>
+                </button>
+                <button onclick="filterResource('coal')" class="resource-card coal-gradient rounded-xl p-3 text-center">
+                    <div class="text-2xl mb-1">⬛</div>
+                    <div class="text-sm font-medium">煤炭</div>
+                    <div class="text-xs text-white/70">Coal</div>
+                </button>
+                <button onclick="filterResource('mineral')" class="resource-card mineral-gradient rounded-xl p-3 text-center">
+                    <div class="text-2xl mb-1">⛏️</div>
+                    <div class="text-sm font-medium">鐵礦/銅礦</div>
+                    <div class="text-xs text-white/70">Iron/Copper</div>
+                </button>
+                <button onclick="filterResource('rare')" class="resource-card rare-gradient rounded-xl p-3 text-center">
+                    <div class="text-2xl mb-1">🔋</div>
+                    <div class="text-sm font-medium">稀土</div>
+                    <div class="text-xs text-white/70">Rare Earth</div>
+                </button>
+                <button onclick="filterResource('gold')" class="resource-card gold-gradient rounded-xl p-3 text-center">
+                    <div class="text-2xl mb-1">👑</div>
+                    <div class="text-sm font-medium">黃金</div>
+                    <div class="text-xs text-white/70">Gold</div>
+                </button>
+                <button onclick="filterResource('silver')" class="resource-card silver-gradient rounded-xl p-3 text-center">
+                    <div class="text-2xl mb-1">🥈</div>
+                    <div class="text-sm font-medium">白銀</div>
+                    <div class="text-xs text-white/70">Silver</div>
+                </button>
+                <button onclick="filterResource('diamond')" class="resource-card diamond-gradient rounded-xl p-3 text-center">
+                    <div class="text-2xl mb-1">💎</div>
+                    <div class="text-sm font-medium">鑽石</div>
+                    <div class="text-xs text-white/70">Diamond</div>
+                </button>
+                <button onclick="filterResource('lithium')" class="resource-card lithium-gradient rounded-xl p-3 text-center">
+                    <div class="text-2xl mb-1">🔋</div>
+                    <div class="text-sm font-medium">鋰礦</div>
+                    <div class="text-xs text-white/70">Lithium</div>
+                </button>
+                <button onclick="filterResource('nickel')" class="resource-card nickel-gradient rounded-xl p-3 text-center">
+                    <div class="text-2xl mb-1">⚙️</div>
+                    <div class="text-sm font-medium">鎳礦</div>
+                    <div class="text-xs text-white/70">Nickel</div>
+                </button>
+                <button onclick="filterResource('phosphate')" class="resource-card phosphate-gradient rounded-xl p-3 text-center">
+                    <div class="text-2xl mb-1">🧪</div>
+                    <div class="text-sm font-medium">磷酸鹽</div>
+                    <div class="text-xs text-white/70">Phosphate</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid lg:grid-cols-3 gap-6">
+            <!-- Map Section -->
+            <div class="lg:col-span-2">
+                <div class="glass-panel rounded-2xl p-6">
+                    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <span>🗺️</span> 資源分布地圖
+                    </h2>
+                    <div id="map-container" class="relative rounded-xl overflow-hidden bg-slate-900" style="height: 500px;">
+                        <svg id="world-map" width="100%" height="100%"></svg>
+                        <div id="tooltip" class="tooltip hidden"></div>
+                    </div>
+                    <div class="mt-4 flex flex-wrap gap-4 text-sm text-slate-400">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-red-600"></span> 石油
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-amber-500"></span> 天然氣
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-gray-600"></span> 煤炭
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-purple-600"></span> 鐵/銅礦
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-cyan-500"></span> 稀土
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-yellow-500"></span> 黃金
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Country Details -->
+            <div class="lg:col-span-1">
+                <div class="glass-panel rounded-2xl p-6">
+                    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <span>📊</span> 國家資源詳情
+                    </h2>
+                    <div id="country-details" class="space-y-4">
+                        <div class="text-slate-400 text-center py-8">
+                            <span class="text-4xl mb-2 block">👆</span>
+                            點擊地圖上的國家查看詳情
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Exporters -->
+                <div class="glass-panel rounded-2xl p-6 mt-6">
+                    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <span>🚢</span> 主要出口國
+                    </h2>
+                    <div id="top-exporters" class="space-y-3">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resource Cards Grid -->
+        <div class="mt-8">
+            <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                <span>📍</span> 主要資源產區
+            </h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="resource-cards">
+                <!-- Cards will be generated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Resource Data
+        const resourceData = {
+            // Middle East - Oil & Gas
+            'Saudi Arabia': {
+                name: '沙烏地阿拉伯',
+                resources: ['oil', 'gas'],
+                oilReserves: '17.2%',
+                gasReserves: '4.5%',
+                mainExports: ['中國', '日本', '印度', '美國', '韓國'],
+                description: '全球最大石油出口國，OPEC核心成員',
+                color: '#dc2626'
+            },
+            'Iran': {
+                name: '伊朗',
+                resources: ['oil', 'gas'],
+                oilReserves: '9.1%',
+                gasReserves: '15.3%',
+                mainExports: ['中國', '印度', '土耳其', '韓國'],
+                description: '全球第二大天然氣儲量國',
+                color: '#dc2626'
+            },
+            'Iraq': {
+                name: '伊拉克',
+                resources: ['oil'],
+                oilReserves: '8.4%',
+                mainExports: ['中國', '印度', '美國', '韓國', '義大利'],
+                description: '中東重要石油生產國',
+                color: '#dc2626'
+            },
+            'Kuwait': {
+                name: '科威特',
+                resources: ['oil'],
+                oilReserves: '5.9%',
+                mainExports: ['中國', '日本', '印度', '韓國', '新加坡'],
+                description: '石油儲量豐富的小型國家',
+                color: '#dc2626'
+            },
+            'UAE': {
+                name: '阿拉伯聯合大公國',
+                resources: ['oil', 'gas'],
+                oilReserves: '5.7%',
+                mainExports: ['日本', '印度', '中國', '新加坡', '泰國'],
+                description: '多元化經濟的石油出口國',
+                color: '#dc2626'
+            },
+            'Qatar': {
+                name: '卡達',
+                resources: ['gas', 'oil'],
+                gasReserves: '13.1%',
+                mainExports: ['日本', '韓國', '印度', '中國', '英國'],
+                description: '全球最大LNG出口國',
+                color: '#f59e0b'
+            },
+            
+            // Russia - Oil, Gas, Coal, Minerals
+            'Russia': {
+                name: '俄羅斯',
+                resources: ['oil', 'gas', 'coal', 'mineral'],
+                oilReserves: '6.2%',
+                gasReserves: '19.9%',
+                coalReserves: '15.1%',
+                mainExports: ['中國', '德國', '荷蘭', '白俄羅斯', '土耳其'],
+                description: '全球最大天然氣出口國，重要石油和煤炭生產國',
+                color: '#7c3aed'
+            },
+            
+            // USA - Oil, Gas, Coal
+            'United States': {
+                name: '美國',
+                resources: ['oil', 'gas', 'coal'],
+                oilReserves: '3.8%',
+                gasReserves: '5.3%',
+                coalReserves: '22.1%',
+                mainExports: ['加拿大', '墨西哥', '中國', '日本', '韓國'],
+                description: '全球最大石油生產國，頁岩油氣革命領導者',
+                color: '#7c3aed'
+            },
+            
+            // China - Rare Earth, Coal
+            'China': {
+                name: '中國',
+                resources: ['rare', 'coal', 'mineral'],
+                rareEarthReserves: '37.8%',
+                coalReserves: '13.3%',
+                mainExports: ['日本', '美國', '德國', '韓國', '荷蘭'],
+                description: '全球稀土儲量和產量第一大國',
+                color: '#06b6d4'
+            },
+            
+            // Australia - Iron, Coal, Gold, LNG
+            'Australia': {
+                name: '澳洲',
+                resources: ['mineral', 'coal', 'gold', 'gas'],
+                ironOreReserves: '28.5%',
+                coalReserves: '14.0%',
+                mainExports: ['中國', '日本', '韓國', '印度', '台灣'],
+                description: '全球最大鐵礦石出口國，重要LNG供應國',
+                color: '#eab308'
+            },
+            
+            // Brazil - Iron, Lumber
+            'Brazil': {
+                name: '巴西',
+                resources: ['mineral', 'lumber'],
+                ironOreReserves: '18.9%',
+                mainExports: ['中國', '日本', '荷蘭', '韓國', '德國'],
+                description: '全球第二大鐵礦石出口國，亞馬遜雨林木材',
+                color: '#22c55e'
+            },
+            
+            // South Africa - Gold, Diamond, Coal
+            'South Africa': {
+                name: '南非',
+                resources: ['gold', 'diamond', 'coal', 'mineral'],
+                goldReserves: '12.8%',
+                platinumReserves: '90%+',
+                mainExports: ['中國', '美國', '德國', '日本', '印度'],
+                description: '全球重要黃金、白金、鑽石產國',
+                color: '#eab308'
+            },
+            
+            // Canada - Oil, Lumber, Minerals
+            'Canada': {
+                name: '加拿大',
+                resources: ['oil', 'lumber', 'mineral'],
+                oilReserves: '10.0%',
+                mainExports: ['美國', '中國', '英國', '日本', '墨西哥'],
+                description: '油砂資源豐富，重要木材出口國',
+                color: '#dc2626'
+            },
+            
+            // Venezuela - Oil
+            'Venezuela': {
+                name: '委內瑞拉',
+                resources: ['oil'],
+                oilReserves: '17.5%',
+                mainExports: ['中國', '印度', '新加坡', '西班牙'],
+                description: '全球最大石油儲量國（重油）',
+                color: '#dc2626'
+            },
+            
+            // Chile - Copper
+            'Chile': {
+                name: '智利',
+                resources: ['mineral'],
+                copperReserves: '23.0%',
+                mainExports: ['中國', '日本', '美國', '巴西', '韓國'],
+                description: '全球最大銅礦生產國',
+                color: '#7c3aed'
+            },
+            
+            // Peru - Copper, Gold
+            'Peru': {
+                name: '秘魯',
+                resources: ['mineral', 'gold'],
+                copperReserves: '11.0%',
+                mainExports: ['中國', '美國', '日本', '韓國', '加拿大'],
+                description: '全球第二大銅礦生產國',
+                color: '#eab308'
+            },
+            
+            // India - Coal
+            'India': {
+                name: '印度',
+                resources: ['coal'],
+                coalReserves: '10.3%',
+                mainExports: ['孟加拉', '尼泊爾', '不丹'],
+                description: '煤炭消費大國，部分出口鄰國',
+                color: '#374151'
+            },
+            
+            // Indonesia - Coal, LNG, Palm Oil
+            'Indonesia': {
+                name: '印尼',
+                resources: ['coal', 'gas'],
+                coalReserves: '3.5%',
+                mainExports: ['中國', '印度', '日本', '韓國', '馬來西亞'],
+                description: '全球最大動力煤出口國，重要LNG供應國',
+                color: '#374151'
+            },
+            
+            // Kazakhstan - Oil, Uranium
+            'Kazakhstan': {
+                name: '哈薩克',
+                resources: ['oil', 'mineral'],
+                oilReserves: '1.8%',
+                uraniumReserves: '12.0%',
+                mainExports: ['義大利', '荷蘭', '中國', '法國', '韓國'],
+                description: '中亞最大石油生產國，重要鈾礦產國',
+                color: '#dc2626'
+            },
+            
+            // Norway - Oil, Gas
+            'Norway': {
+                name: '挪威',
+                resources: ['oil', 'gas'],
+                oilReserves: '0.8%',
+                mainExports: ['英國', '德國', '荷蘭', '法國', '比利時'],
+                description: '西歐最大石油生產國，重要天然氣供應國',
+                color: '#f59e0b'
+            },
+            
+            // Nigeria - Oil
+            'Nigeria': {
+                name: '奈及利亞',
+                resources: ['oil'],
+                oilReserves: '2.1%',
+                mainExports: ['印度', '西班牙', '荷蘭', '美國', '南非'],
+                description: '非洲最大石油生產國',
+                color: '#dc2626'
+            },
+            
+            // Libya - Oil
+            'Libya': {
+                name: '利比亞',
+                resources: ['oil'],
+                oilReserves: '2.9%',
+                mainExports: ['義大利', '德國', '西班牙', '法國', '中國'],
+                description: '北非重要石油出口國',
+                color: '#dc2626'
+            },
+            
+            // Algeria - Oil, Gas
+            'Algeria': {
+                name: '阿爾及利亞',
+                resources: ['oil', 'gas'],
+                gasReserves: '3.6%',
+                mainExports: ['義大利', '西班牙', '法國', '土耳其', '英國'],
+                description: '非洲最大天然氣出口國',
+                color: '#f59e0b'
+            },
+            
+            // Botswana - Diamond
+            'Botswana': {
+                name: '波札那',
+                resources: ['diamond'],
+                diamondReserves: '20%+',
+                mainExports: ['比利時', '印度', '阿聯', '新加坡', '以色列'],
+                description: '全球重要鑽石產國',
+                color: '#ec4899'
+            },
+            
+            // Democratic Republic of Congo - Cobalt, Diamond
+            'Democratic Republic of the Congo': {
+                name: '剛果民主共和國',
+                resources: ['mineral', 'diamond'],
+                cobaltReserves: '50%+',
+                mainExports: ['中國', '新加坡', '阿聯', '南非', '坦尚尼亞'],
+                description: '全球鈷礦最大產國（電池原料）',
+                color: '#ec4899'
+            },
+            
+            // Guinea - Bauxite
+            'Guinea': {
+                name: '幾內亞',
+                resources: ['mineral'],
+                bauxiteReserves: '25.0%',
+                mainExports: ['中國', '西班牙', '印度', '烏克蘭', '德國'],
+                description: '全球鋁土礦最大儲量國',
+                color: '#7c3aed'
+            },
+            
+            // Russia - Lumber (Siberia)
+            'Russia-Lumber': {
+                name: '俄羅斯（西伯利亞）',
+                resources: ['lumber'],
+                forestArea: '20%+',
+                mainExports: ['中國', '日本', '韓國', '芬蘭', '德國'],
+                description: '全球最大森林面積國家，重要木材出口國',
+                color: '#22c55e'
+            },
+            
+            // Sweden - Iron
+            'Sweden': {
+                name: '瑞典',
+                resources: ['mineral'],
+                ironOreReserves: '高品質',
+                mainExports: ['德國', '英國', '荷蘭', '芬蘭', '挪威'],
+                description: '歐盟最大鐵礦石生產國（高品質）',
+                color: '#7c3aed'
+            },
+            
+            // Ukraine - Iron, Coal
+            'Ukraine': {
+                name: '烏克蘭',
+                resources: ['mineral', 'coal'],
+                ironOreReserves: '3.0%',
+                mainExports: ['中國', '波蘭', '捷克', '斯洛伐克'],
+                description: '東歐重要鐵礦石和煤炭產區',
+                color: '#7c3aed'
+            },
+            
+            // Argentina - Lithium, Agriculture
+            'Argentina': {
+                name: '阿根廷',
+                resources: ['lithium', 'gas', 'oil'],
+                lithiumReserves: '21.0%',
+                mainExports: ['中國', '日本', '韓國', '美國', '德國'],
+                description: '南美鋰三角之一，重要鋰礦產國',
+                color: '#14b8a6'
+            },
+            
+            // Bolivia - Lithium, Silver
+            'Bolivia': {
+                name: '玻利維亞',
+                resources: ['lithium', 'silver'],
+                lithiumReserves: '23.0%',
+                mainExports: ['中國', '巴西', '阿根廷', '美國'],
+                description: '全球最大鋰儲量國（烏尤尼鹽沼）',
+                color: '#14b8a6'
+            },
+            
+            // Chile - Lithium (update)
+            'Chile-Lithium': {
+                name: '智利（鋰礦）',
+                resources: ['lithium', 'copper'],
+                lithiumReserves: '42.0%',
+                mainExports: ['中國', '韓國', '日本', '美國'],
+                description: '全球最大鋰生產國（阿塔卡馬鹽沼）',
+                color: '#14b8a6'
+            },
+            
+            // Mexico - Silver, Oil
+            'Mexico': {
+                name: '墨西哥',
+                resources: ['silver', 'oil', 'gold'],
+                silverReserves: '18.0%',
+                mainExports: ['美國', '加拿大', '中國', '西班牙'],
+                description: '全球重要白銀生產國',
+                color: '#94a3b8'
+            },
+            
+            // Poland - Coal, Copper
+            'Poland': {
+                name: '波蘭',
+                resources: ['coal', 'mineral'],
+                coalReserves: '歐盟最大',
+                mainExports: ['德國', '捷克', '烏克蘭', '奧地利'],
+                description: '歐盟最大煤炭生產國',
+                color: '#374151'
+            },
+            
+            // Germany - Coal, Lignite
+            'Germany': {
+                name: '德國',
+                resources: ['coal'],
+                coalReserves: '褐煤豐富',
+                mainExports: '煤炭淨進口國',
+                description: '歐洲最大煤炭消費國，已逐步淘汰核電',
+                color: '#374151'
+            },
+            
+            // Turkey - Boron, Chromium
+            'Turkey': {
+                name: '土耳其',
+                resources: ['mineral'],
+                boronReserves: '73.0%',
+                mainExports: ['中國', '美國', '歐洲', '日本'],
+                description: '全球硼礦儲量第一大國',
+                color: '#7c3aed'
+            },
+            
+            // Afghanistan - Lithium, Rare Earth
+            'Afghanistan': {
+                name: '阿富汗',
+                resources: ['lithium', 'rare', 'copper'],
+                lithiumReserves: '潛力巨大',
+                mainExports: '開發中',
+                description: '「鋰礦中的沙烏地」，儲量估計價值數兆美元',
+                color: '#14b8a6'
+            },
+            
+            // Mongolia - Copper, Coal, Rare Earth
+            'Mongolia': {
+                name: '蒙古',
+                resources: ['mineral', 'coal', 'rare'],
+                copperReserves: 'Oyu Tolgoi大型礦區',
+                mainExports: ['中國', '俄羅斯'],
+                description: '夾在中俄之間的資源大國，銅煤稀土豐富',
+                color: '#7c3aed'
+            },
+            
+            // Uzbekistan - Gold, Uranium
+            'Uzbekistan': {
+                name: '烏茲別克',
+                resources: ['gold', 'mineral'],
+                goldReserves: '全球前十',
+                mainExports: ['瑞士', '英國', '中國', '土耳其'],
+                description: '中亞重要黃金生產國',
+                color: '#eab308'
+            },
+            
+            // Kyrgyzstan - Gold
+            'Kyrgyzstan': {
+                name: '吉爾吉斯',
+                resources: ['gold'],
+                goldReserves: 'Kumtor大型金礦',
+                mainExports: ['瑞士', '哈薩克', '土耳其', '俄羅斯'],
+                description: '中亞重要黃金產國',
+                color: '#eab308'
+            },
+            
+            // Papua New Guinea - Gold, Copper
+            'Papua New Guinea': {
+                name: '巴布亞紐幾內亞',
+                resources: ['gold', 'mineral'],
+                goldReserves: '重要產區',
+                mainExports: ['澳洲', '中國', '日本', '德國'],
+                description: '大洋洲重要金銅礦產國',
+                color: '#eab308'
+            },
+            
+            // New Caledonia - Nickel
+            'New Caledonia': {
+                name: '新喀里多尼亞',
+                resources: ['mineral'],
+                nickelReserves: '25.0%',
+                mainExports: ['中國', '日本', '韓國', '法國'],
+                description: '法國海外屬地，全球鎳礦重要產區',
+                color: '#7c3aed'
+            },
+            
+            // Philippines - Nickel, Copper, Gold
+            'Philippines': {
+                name: '菲律賓',
+                resources: ['mineral', 'gold', 'nickel'],
+                nickelReserves: '4.8%',
+                mainExports: ['中國', '日本', '韓國', '美國'],
+                description: '全球重要鎳礦生產國（電池原料）',
+                color: '#7c3aed'
+            },
+            
+            // Malaysia - Tin, Palm Oil
+            'Malaysia': {
+                name: '馬來西亞',
+                resources: ['mineral'],
+                tinReserves: '重要產區',
+                mainExports: ['中國', '新加坡', '美國', '日本'],
+                description: '東南亞重要錫礦產國',
+                color: '#7c3aed'
+            },
+            
+            // Thailand - Tin, Tungsten
+            'Thailand': {
+                name: '泰國',
+                resources: ['mineral'],
+                tinReserves: '東南亞重要產區',
+                mainExports: ['中國', '日本', '美國', '馬來西亞'],
+                description: '錫礦和鎢礦重要生產國',
+                color: '#7c3aed'
+            },
+            
+            // Vietnam - Rare Earth, Bauxite
+            'Vietnam': {
+                name: '越南',
+                resources: ['rare', 'mineral'],
+                rareEarthReserves: '18.0%',
+                mainExports: ['中國', '日本', '韓國', '美國'],
+                description: '東南亞稀土儲量第二大國',
+                color: '#06b6d4'
+            },
+            
+            // Myanmar - Jade, Ruby, Rare Earth
+            'Myanmar': {
+                name: '缅甸',
+                resources: ['rare', 'mineral'],
+                jadeReserves: '全球90%',
+                mainExports: ['中國', '泰國', '印度'],
+                description: '全球翡翠主要產地，稀土資源豐富',
+                color: '#06b6d4'
+            },
+            
+            // Laos - Copper, Gold
+            'Laos': {
+                name: '寮國',
+                resources: ['mineral', 'gold'],
+                copperReserves: 'Sepon大型銅金礦',
+                mainExports: ['中國', '泰國', '越南'],
+                description: '東南亞新興銅金礦產國',
+                color: '#eab308'
+            },
+            
+            // Cambodia - Oil Potential
+            'Cambodia': {
+                name: '柬埔寨',
+                resources: ['oil'],
+                oilReserves: '開發中',
+                mainExports: '開發中',
+                description: '暹羅灣石油資源開發中',
+                color: '#dc2626'
+            },
+            
+            // Sudan - Gold, Oil
+            'Sudan': {
+                name: '蘇丹',
+                resources: ['gold', 'oil'],
+                goldReserves: '非洲重要產區',
+                mainExports: ['中國', '阿聯', '沙烏地', '印度'],
+                description: '非洲新興黃金生產國',
+                color: '#eab308'
+            },
+            
+            // Ethiopia - Gold, Potash
+            'Ethiopia': {
+                name: '埃塞俄比亞',
+                resources: ['gold', 'mineral'],
+                goldReserves: '潛力巨大',
+                mainExports: ['瑞士', '中國', '阿聯', '印度'],
+                description: '非洲之角新興金礦產國',
+                color: '#eab308'
+            },
+            
+            // Tanzania - Gold, Diamonds, Tanzanite
+            'Tanzania': {
+                name: '坦尚尼亞',
+                resources: ['gold', 'diamond'],
+                goldReserves: '非洲第四大',
+                mainExports: ['瑞士', '印度', '阿聯', '中國'],
+                description: '坦桑石唯一產地，重要金礦國',
+                color: '#eab308'
+            },
+            
+            // Zambia - Copper, Cobalt
+            'Zambia': {
+                name: '尚比亞',
+                resources: ['mineral'],
+                copperReserves: '6.0%',
+                mainExports: ['瑞士', '中國', '剛果', '新加坡'],
+                description: '非洲第二大銅礦生產國',
+                color: '#7c3aed'
+            },
+            
+            // Zimbabwe - Platinum, Diamonds, Lithium
+            'Zimbabwe': {
+                name: '辛巴威',
+                resources: ['mineral', 'diamond', 'lithium'],
+                platinumReserves: '重要產區',
+                mainExports: ['中國', '南非', '阿聯', '比利時'],
+                description: '非洲重要白金和鑽石產國，新發現大型鋰礦',
+                color: '#ec4899'
+            },
+            
+            // Madagascar - Graphite, Nickel
+            'Madagascar': {
+                name: '馬達加斯加',
+                resources: ['mineral'],
+                graphiteReserves: '全球最大之一',
+                mainExports: ['中國', '美國', '法國', '日本'],
+                description: '非洲最大石墨生產國（電池原料）',
+                color: '#7c3aed'
+            },
+            
+            // Mozambique - Rubies, Natural Gas
+            'Mozambique': {
+                name: '莫三比克',
+                resources: ['gas', 'mineral'],
+                rubyReserves: '全球最大紅寶石產地',
+                mainExports: ['印度', '中國', '南非', '荷蘭'],
+                description: 'Rovuma盆地天然氣，蒙特普埃茲紅寶石',
+                color: '#f59e0b'
+            },
+            
+            // Namibia - Diamonds, Uranium
+            'Namibia': {
+                name: '納米比亞',
+                resources: ['diamond', 'mineral'],
+                uraniumReserves: '重要產區',
+                mainExports: ['中國', '南非', '比利時', '西班牙'],
+                description: '深海鑽石開採，重要鈾礦產國',
+                color: '#ec4899'
+            },
+            
+            // Angola - Oil, Diamonds
+            'Angola': {
+                name: '安哥拉',
+                resources: ['oil', 'diamond'],
+                oilReserves: '1.3%',
+                mainExports: ['中國', '印度', '西班牙', '葡萄牙'],
+                description: '非洲第二大石油生產國',
+                color: '#dc2626'
+            },
+            
+            // Ghana - Gold, Oil, Cocoa
+            'Ghana': {
+                name: '迦納',
+                resources: ['gold', 'oil'],
+                goldReserves: '非洲第二大',
+                mainExports: ['瑞士', '印度', '中國', '阿聯'],
+                description: '西非黃金之國，新興石油產國',
+                color: '#eab308'
+            },
+            
+            // Mali - Gold
+            'Mali': {
+                name: '馬利',
+                resources: ['gold'],
+                goldReserves: '非洲第三大',
+                mainExports: ['瑞士', '澳洲', '南非', '中國'],
+                description: '西非重要黃金產國',
+                color: '#eab308'
+            },
+            
+            // Burkina Faso - Gold
+            'Burkina Faso': {
+                name: '布吉納法索',
+                resources: ['gold'],
+                goldReserves: '非洲第四大',
+                mainExports: ['瑞士', '印度', '新加坡', '澳洲'],
+                description: '西非新興黃金生產國',
+                color: '#eab308'
+            },
+            
+            // Mauritania - Iron Ore
+            'Mauritania': {
+                name: '茅利塔尼亞',
+                resources: ['mineral'],
+                ironOreReserves: '重要產區',
+                mainExports: ['中國', '法國', '西班牙', '德國'],
+                description: '西非重要鐵礦石出口國',
+                color: '#7c3aed'
+            },
+            
+            // Senegal - Phosphates
+            'Senegal': {
+                name: '塞內加爾',
+                resources: ['mineral'],
+                phosphateReserves: '重要產區',
+                mainExports: ['印度', '巴西', '荷蘭', '比利時'],
+                description: '西非磷酸鹽重要產國',
+                color: '#7c3aed'
+            },
+            
+            // Morocco - Phosphates
+            'Morocco': {
+                name: '摩洛哥',
+                resources: ['mineral'],
+                phosphateReserves: '70.0%',
+                mainExports: ['印度', '巴西', '美國', '印尼'],
+                description: '全球磷酸鹽儲量第一大國（化肥原料）',
+                color: '#7c3aed'
+            },
+            
+            // Tunisia - Phosphates, Oil
+            'Tunisia': {
+                name: '突尼西亞',
+                resources: ['mineral', 'oil'],
+                phosphateReserves: '重要產區',
+                mainExports: ['義大利', '法國', '德國', '西班牙'],
+                description: '北非磷酸鹽和石油產國',
+                color: '#7c3aed'
+            },
+            
+            // Egypt - Natural Gas, Phosphates
+            'Egypt': {
+                name: '埃及',
+                resources: ['gas', 'mineral'],
+                gasReserves: '1.8%',
+                mainExports: ['義大利', '土耳其', '西班牙', '約旦'],
+                description: '北非重要天然氣生產國，Zohr氣田',
+                color: '#f59e0b'
+            },
+            
+            // Israel - Natural Gas
+            'Israel': {
+                name: '以色列',
+                resources: ['gas'],
+                gasReserves: 'Leviathan氣田',
+                mainExports: ['埃及', '約旦', '歐洲'],
+                description: '東地中海新興天然氣出口國',
+                color: '#f59e0b'
+            },
+            
+            // Jordan - Phosphates, Potash
+            'Jordan': {
+                name: '約旦',
+                resources: ['mineral'],
+                phosphateReserves: '重要產區',
+                mainExports: ['印度', '印尼', '中國', '巴西'],
+                description: '中東磷酸鹽和鉀肥重要產國',
+                color: '#7c3aed'
+            },
+            
+            // Syria - Oil, Phosphates
+            'Syria': {
+                name: '敘利亞',
+                resources: ['oil', 'mineral'],
+                oilReserves: '戰前重要產區',
+                mainExports: '受制裁影響',
+                description: '戰前中東重要石油產國，資源開發受阻',
+                color: '#dc2626'
+            },
+            
+            // Yemen - Oil
+            'Yemen': {
+                name: '葉門',
+                resources: ['oil'],
+                oilReserves: '開發受限',
+                mainExports: '戰亂影響',
+                description: '阿拉伯半島南部石油產國，戰亂影響生產',
+                color: '#dc2626'
+            },
+            
+            // Oman - Oil, Copper
+            'Oman': {
+                name: '阿曼',
+                resources: ['oil', 'mineral'],
+                oilReserves: '0.5%',
+                mainExports: ['中國', '印度', '日本', '韓國'],
+                description: '中東穩定石油出口國，重要銅礦產區',
+                color: '#dc2626'
+            },
+            
+            // Bahrain - Oil, Aluminum
+            'Bahrain': {
+                name: '巴林',
+                resources: ['oil'],
+                oilReserves: '少量',
+                mainExports: ['沙烏地', '阿聯', '美國', '日本'],
+                description: '中東最早產油國之一，煉油中心',
+                color: '#dc2626'
+            },
+            
+            // Brunei - Oil, Natural Gas
+            'Brunei': {
+                name: '汶萊',
+                resources: ['oil', 'gas'],
+                oilReserves: '0.1%',
+                mainExports: ['日本', '韓國', '澳洲', '印度'],
+                description: '東南亞石油天然氣小國，人均GDP高',
+                color: '#dc2626'
+            },
+            
+            // East Timor - Oil
+            'Timor-Leste': {
+                name: '東帝汶',
+                resources: ['oil'],
+                oilReserves: 'Greater Sunrise氣田',
+                mainExports: ['澳洲', '新加坡', '日本', '中國'],
+                description: '東南亞新興石油產國，與澳洲爭議氣田',
+                color: '#dc2626'
+            },
+            
+            // Cuba - Nickel, Cobalt
+            'Cuba': {
+                name: '古巴',
+                resources: ['mineral'],
+                nickelReserves: '重要產區',
+                mainExports: ['中國', '加拿大', '西班牙', '荷蘭'],
+                description: '加勒比海重要鎳鈷礦產國',
+                color: '#7c3aed'
+            },
+            
+            // Jamaica - Bauxite
+            'Jamaica': {
+                name: '牙買加',
+                resources: ['mineral'],
+                bauxiteReserves: '7.0%',
+                mainExports: ['美國', '加拿大', '中國', '挪威'],
+                description: '加勒比海鋁土礦重要產國',
+                color: '#7c3aed'
+            },
+            
+            // Haiti - Bauxite, Copper
+            'Haiti': {
+                name: '海地',
+                resources: ['mineral'],
+                bauxiteReserves: '潛力巨大',
+                mainExports: '開發中',
+                description: '加勒比海礦產資源待開發',
+                color: '#7c3aed'
+            },
+            
+            // Dominican Republic - Gold, Nickel
+            'Dominican Republic': {
+                name: '多明尼加',
+                resources: ['gold', 'mineral'],
+                goldReserves: 'Pueblo Viejo大型金礦',
+                mainExports: ['美國', '加拿大', '瑞士', '中國'],
+                description: '加勒比海重要金礦產國',
+                color: '#eab308'
+            },
+            
+            // Panama - Copper
+            'Panama': {
+                name: '巴拿馬',
+                resources: ['mineral'],
+                copperReserves: 'Cobre Panama大型銅礦',
+                mainExports: ['中國', '日本', '韓國', '美國'],
+                description: '中美洲最大銅礦產國',
+                color: '#7c3aed'
+            },
+            
+            // Costa Rica - No major resources
+            'Costa Rica': {
+                name: '哥斯大黎加',
+                resources: [],
+                description: '生態旅遊國家，無重大礦產資源',
+                color: '#334155'
+            },
+            
+            // Guatemala - Nickel, Oil
+            'Guatemala': {
+                name: '瓜地馬拉',
+                resources: ['mineral', 'oil'],
+                nickelReserves: 'Fenix大型鎳礦',
+                mainExports: ['美國', '中國', '薩爾瓦多', '宏都拉斯'],
+                description: '中美洲鎳礦和石油產國',
+                color: '#7c3aed'
+            },
+            
+            // Honduras - Zinc, Gold, Silver
+            'Honduras': {
+                name: '宏都拉斯',
+                resources: ['mineral', 'gold', 'silver'],
+                zincReserves: '重要產區',
+                mainExports: ['美國', '中國', '德國', '比利時'],
+                description: '中美洲鋅金銀礦產國',
+                color: '#7c3aed'
+            },
+            
+            // Nicaragua - Gold
+            'Nicaragua': {
+                name: '尼加拉瓜',
+                resources: ['gold'],
+                goldReserves: '重要產區',
+                mainExports: ['美國', '加拿大', '瑞士', '中國'],
+                description: '中美洲新興金礦產國',
+                color: '#eab308'
+            },
+            
+            // El Salvador - No major resources
+            'El Salvador': {
+                name: '薩爾瓦多',
+                resources: [],
+                description: '中美洲小國，無重大礦產資源',
+                color: '#334155'
+            },
+            
+            // Belize - Oil
+            'Belize': {
+                name: '貝里斯',
+                resources: ['oil'],
+                oilReserves: '少量',
+                mainExports: ['美國', '英國', '加勒比國家'],
+                description: '中美洲小型石油產國',
+                color: '#dc2626'
+            },
+            
+            // Suriname - Bauxite, Gold
+            'Suriname': {
+                name: '蘇利南',
+                resources: ['mineral', 'gold'],
+                bauxiteReserves: '重要產區',
+                mainExports: ['瑞士', '阿聯', '比利時', '美國'],
+                description: '南美小型鋁土礦和金礦產國',
+                color: '#7c3aed'
+            },
+            
+            // Guyana - Oil (recent discovery)
+            'Guyana': {
+                name: '蓋亞那',
+                resources: ['oil'],
+                oilReserves: '11億桶（新發現）',
+                mainExports: ['美國', '加勒比', '歐洲'],
+                description: '南美新興石油大國，ExxonMobil開發',
+                color:
+
+        // Initialize Map
+        function initMap() {
+            const width = document.getElementById('map-container').clientWidth;
+            const height = 500;
+            
+            const svg = d3.select('#world-map')
+                .attr('viewBox', `0 0 ${width} ${height}`);
+            
+            const projection = d3.geoNaturalEarth1()
+                .scale(width / 5.5)
+                .translate([width / 2, height / 2]);
+            
+            const path = d3.geoPath().projection(projection);
+            
+            // Load world data
+            d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(world => {
+                const countries = topojson.feature(world, world.objects.countries);
+                
+                // Draw countries
+                svg.selectAll('path')
+                    .data(countries.features)
+                    .enter()
+                    .append('path')
+                    .attr('class', 'country-path')
+                    .attr('d', path)
+                    .attr('fill', d => getCountryColor(d.properties.name))
+                    .attr('stroke', '#1e293b')
+                    .attr('stroke-width', 0.5)
+                    .on('click', (event, d) => showCountryDetails(d.properties.name))
+                    .on('mouseover', function(event, d) {
+                        d3.select(this).attr('opacity', 0.8);
+                        showTooltip(event, d.properties.name);
+                    })
+                    .on('mouseout', function() {
+                        d3.select(this).attr('opacity', 1);
+                        hideTooltip();
+                    });
+                
+                // Add resource markers
+                addResourceMarkers(svg, projection);
+            });
+        }
+
+        function getCountryColor(countryName) {
+            const data = resourceData[countryName];
+            if (!data) return '#334155';
+            return data.color || '#334155';
+        }
+
+        function addResourceMarkers(svg, projection) {
+            const markers = [
+                { name: 'Saudi Arabia', coords: [45, 25], type: 'oil' },
+                { name: 'Iran', coords: [53, 32], type: 'oil' },
+                { name: 'Russia', coords: [95, 60], type: 'gas' },
+                { name: 'China', coords: [105, 35], type: 'rare' },
+                { name: 'Australia', coords: [135, -25], type: 'mineral' },
+                { name: 'United States', coords: [-100, 40], type: 'oil' },
+                { name: 'Canada', coords: [-110, 60], type: 'oil' },
+                { name: 'Brazil', coords: [-55, -10], type: 'lumber' },
+                { name: 'South Africa', coords: [25, -30], type: 'gold' },
+                { name: 'Chile', coords: [-70, -30], type: 'mineral' }
+            ];
+            
+            markers.forEach(marker => {
+                const [x, y] = projection(marker.coords);
+                if (x && y) {
+                    svg.append('circle')
+                        .attr('cx', x)
+                        .attr('cy', y)
+                        .attr('r', 6)
+                        .attr('fill', getResourceColor(marker.type))
+                        .attr('stroke', '#fff')
+                        .attr('stroke-width', 2)
+                        .attr('class', 'pulse-ring')
+                        .style('cursor', 'pointer')
+                        .on('click', () => showCountryDetails(marker.name));
+                }
+            });
+        }
+
+        function getResourceColor(type) {
+            const colors = {
+                oil: '#dc2626',
+                gas: '#f59e0b',
+                coal: '#374151',
+                mineral: '#7c3aed',
+                rare: '#06b6d4',
+                gold: '#eab308',
+                silver: '#94a3b8',
+                diamond: '#ec4899',
+                lumber: '#22c55e',
+                lithium: '#14b8a6',
+                nickel: '#6366f1',
+                phosphate: '#f97316'
+            };
+            return colors[type] || '#94a3b8';
+        }
+
+        function showCountryDetails(countryName) {
+            const data = resourceData[countryName];
+            const container = document.getElementById('country-details');
+            
+            if (!data) {
+                container.innerHTML = `
+                    <div class="text-slate-400 text-center py-8">
+                        <span class="text-4xl mb-2 block">📍</span>
+                        ${countryName}<br>暫無詳細資源資料
+                    </div>
+                `;
+                return;
+            }
+            
+            const resourceIcons = {
+                oil: '🛢️', gas: '🔥', coal: '⬛', mineral: '⛏️',
+                rare: '🔋', gold: '👑', silver: '🥈', diamond: '💎',
+                lumber: '🌲', lithium: '🔋', nickel: '⚙️', phosphate: '🧪'
+            };
+            
+            const resourceNames = {
+                oil: '石油', gas: '天然氣', coal: '煤炭', mineral: '鐵/銅礦',
+                rare: '稀土', gold: '黃金', silver: '白銀', diamond: '鑽石',
+                lumber: '木材', lithium: '鋰礦', nickel: '鎳礦', phosphate: '磷酸鹽'
+            };
+            
+            container.innerHTML = `
+                <div class="border-b border-slate-700 pb-4 mb-4">
+                    <h3 class="text-xl font-bold text-white">${data.name}</h3>
+                    <p class="text-slate-400 text-sm mt-1">${data.description}</p>
+                </div>
+                
+                <div class="space-y-3">
+                    <div>
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">主要資源</h4>
+                        <div class="flex flex-wrap gap-2">
+                            ${data.resources.map(r => `
+                                <span class="px-3 py-1 rounded-full text-sm" style="background: ${getResourceColor(r)}33; color: ${getResourceColor(r)}; border: 1px solid ${getResourceColor(r)}">
+                                    ${resourceIcons[r]} ${resourceNames[r]}
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    ${data.oilReserves ? `
+                        <div class="flex justify-between items-center py-2 border-b border-slate-700/50">
+                            <span class="text-slate-400">石油儲量</span>
+                            <span class="font-semibold text-red-400">${data.oilReserves}</span>
+                        </div>
+                    ` : ''}
+                    
+                    ${data.gasReserves ? `
+                        <div class="flex justify-between items-center py-2 border-b border-slate-700/50">
+                            <span class="text-slate-400">天然氣儲量</span>
+                            <span class="font-semibold text-amber-400">${data.gasReserves}</span>
+                        </div>
+                    ` : ''}
+                    
+                    ${data.coalReserves ? `
+                        <div class="flex justify-between items-center py-2 border-b border-slate-700/50">
+                            <span class="text-slate-400">煤炭儲量</span>
+                            <span class="font-semibold text-gray-400">${data.coalReserves}</span>
+                        </div>
+                    ` : ''}
+                    
+                    <div>
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">主要出口國</h4>
+                        <div class="flex flex-wrap gap-2">
+                            ${data.mainExports.map(exp => `
+                                <span class="px-2 py-1 bg-slate-700 rounded text-xs text-slate-300">${exp}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showTooltip(event, countryName) {
+            const tooltip = document.getElementById('tooltip');
+            const data = resourceData[countryName];
+            
+            if (data) {
+                tooltip.innerHTML = `
+                    <strong>${data.name}</strong><br>
+                    <span class="text-sm text-slate-300">${data.description}</span>
+                `;
+                tooltip.classList.remove('hidden');
+                tooltip.style.left = event.pageX + 10 + 'px';
+                tooltip.style.top = event.pageY + 10 + 'px';
+            }
+        }
+
+        function hideTooltip() {
+            document.getElementById('tooltip').classList.add('hidden');
+        }
+
+        function generateResourceCards() {
+            const container = document.getElementById('resource-cards');
+            const regions = [
+                {
+                    title: '中東 - 世界油庫',
+                    icon: '🛢️',
+                    color: 'red',
+                    countries: ['沙烏地阿拉伯', '伊朗', '伊拉克', '科威特', '阿聯', '卡達'],
+                    stats: '全球55%石油儲量',
+                    exports: '中國、日本、印度、歐美'
+                },
+                {
+                    title: '俄羅斯 - 能源巨人',
+                    icon: '🔥',
+                    color: 'purple',
+                    countries: ['俄羅斯'],
+                    stats: '20%天然氣、6%石油、15%煤炭',
+                    exports: '歐洲、中國、土耳其'
+                },
+                {
+                    title: '北美 - 頁岩革命',
+                    icon: '📈',
+                    color: 'blue',
+                    countries: ['美國', '加拿大'],
+                    stats: '全球最大石油生產國、油砂資源',
+                    exports: '亞洲、歐洲、美洲'
+                },
+                {
+                    title: '澳洲 - 礦業大國',
+                    icon: '⛏️',
+                    color: 'yellow',
+                    countries: ['澳洲'],
+                    stats: '29%鐵礦石、14%煤炭、重要LNG',
+                    exports: '中國、日本、韓國、印度'
+                },
+                {
+                    title: '南美 - 鐵礦與雨林',
+                    icon: '🌲',
+                    color: 'green',
+                    countries: ['巴西', '智利', '秘魯'],
+                    stats: '19%鐵礦石、34%銅礦、亞馬遜木材',
+                    exports: '中國、歐洲、北美'
+                },
+                {
+                    title: '非洲 - 貴金屬與能源',
+                    icon: '💎',
+                    color: 'pink',
+                    countries: ['南非', '波札那', '剛果', '奈及利亞'],
+                    stats: '黃金、鑽石、鈷礦、石油',
+                    exports: '中國、歐洲、印度、美國'
+                },
+                {
+                    title: '中國 - 稀土之王',
+                    icon: '🔋',
+                    color: 'cyan',
+                    countries: ['中國'],
+                    stats: '38%稀土、13%煤炭、多種礦產',
+                    exports: '日本、美國、歐洲、韓國'
+                },
+                {
+                    title: '北歐 - 北海油田',
+                    icon: '🌊',
+                    color: 'orange',
+                    countries: ['挪威', '英國'],
+                    stats: '西歐石油、天然氣供應基地',
+                    exports: '歐洲各國'
+                },
+                {
+                    title: '中亞 - 新興能源走廊',
+                    icon: '🚢',
+                    color: 'indigo',
+                    countries: ['哈薩克', '土庫曼'],
+                    stats: '石油、天然氣、鈾礦',
+                    exports: '中國、歐洲、俄羅斯'
+                }
+            ];
+            
+            const colorClasses = {
+                red: 'from-red-600 to-red-800',
+                purple: 'from-purple-600 to-purple-800',
+                blue: 'from-blue-600 to-blue-800',
+                yellow: 'from-yellow-600 to-yellow-800',
+                green: 'from-green-600 to-green-800',
+                pink: 'from-pink-600 to-pink-800',
+                cyan: 'from-cyan-600 to-cyan-800',
+                orange: 'from-orange-600 to-orange-800',
+                indigo: 'from-indigo-600 to-indigo-800'
+            };
+            
+            container.innerHTML = regions.map(region => `
+                <div class="glass-panel rounded-2xl overflow-hidden hover:transform hover:scale-[1.02] transition-all duration-300">
+                    <div class="h-2 bg-gradient-to-r ${colorClasses[region.color]}"></div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-3xl">${region.icon}</span>
+                            <h3 class="text-lg font-bold">${region.title}</h3>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <span class="text-xs text-slate-400 uppercase tracking-wider">主要國家</span>
+                                <p class="text-sm text-slate-200 mt-1">${region.countries.join('、')}</p>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-400 uppercase tracking-wider">資源占比</span>
+                                <p class="text-sm font-semibold text-white mt-1">${region.stats}</p>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-400 uppercase tracking-wider">主要出口至</span>
+                                <p class="text-sm text-slate-300 mt-1">${region.exports}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function generateTopExporters() {
+            const container = document.getElementById('top-exporters');
+            const exporters = [
+                { resource: '石油', top: '沙烏地阿拉伯、俄羅斯、伊拉克、加拿大、阿聯', color: 'red' },
+                { resource: '天然氣', top: '美國、俄羅斯、卡達、挪威、澳洲', color: 'amber' },
+                { resource: '煤炭', top: '印尼、澳洲、俄羅斯、美國、南非', color: 'gray' },
+                { resource: '鐵礦石', top: '澳洲、巴西、南非、加拿大、瑞典', color: 'purple' },
+                { resource: '銅礦', top: '智利、秘魯、中國、剛果、美國', color: 'orange' },
+                { resource: '稀土', top: '中國、美國、澳洲、俄羅斯、印度', color: 'cyan' },
+                { resource: '黃金', top: '中國、澳洲、俄羅斯、南非、美國', color: 'yellow' },
+                { resource: '鑽石', top: '波札那、俄羅斯、加拿大、剛果、澳洲', color: 'pink' }
+            ];
+            
+            const colorMap = {
+                red: 'text-red-400 border-red-400/30',
+                amber: 'text-amber-400 border-amber-400/30',
+                gray: 'text-gray-400 border-gray-400/30',
+                purple: 'text-purple-400 border-purple-400/30',
+                orange: 'text-orange-400 border-orange-400/30',
+                cyan: 'text-cyan-400 border-cyan-400/30',
+                yellow: 'text-yellow-400 border-yellow-400/30',
+                pink: 'text-pink-400 border-pink-400/30'
+            };
+            
+            container.innerHTML = exporters.map(exp => `
+                <div class="p-3 rounded-lg border ${colorMap[exp.color]} bg-slate-800/50">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="font-semibold ${colorMap[exp.color].split(' ')[0]}">${exp.resource}</span>
+                    </div>
+                    <p class="text-xs text-slate-300">${exp.top}</p>
+                </div>
+            `).join('');
+        }
+
+        function filterResource(type) {
+            // Filter map by resource type
+            d3.selectAll('.country-path')
+                .attr('opacity', d => {
+                    const data = resourceData[d.properties.name];
+                    if (!data) return 0.2;
+                    return data.resources.includes(type) ? 1 : 0.2;
+                });
+        }
+
+        function showAllResources() {
+            d3.selectAll('.country-path').attr('opacity', 1);
+        }
+
+        function resetView() {
+            d3.selectAll('.country-path').attr('opacity', 1);
+            document.getElementById('country-details').innerHTML = `
+                <div class="text-slate-400 text-center py-8">
+                    <span class="text-4xl mb-2 block">👆</span>
+                    點擊地圖上的國家查看詳情
+                </div>
+            `;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            generateResourceCards();
+            generateTopExporters();
+        });
+    </script>
+</body>
+</html>
