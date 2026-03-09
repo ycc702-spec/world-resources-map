@@ -102,9 +102,119 @@
             border: 1px solid rgba(0, 0, 0, 0.1);
             color: #1e293b;
         }
+
+        /* Mobile responsive styles */
+        @media (max-width: 768px) {
+            .glass-panel {
+                padding: 1rem !important;
+            }
+            header .max-w-7xl {
+                padding: 0.5rem 1rem;
+            }
+            header h1 {
+                font-size: 1.25rem;
+            }
+            header p {
+                display: none;
+            }
+            #country-search {
+                width: 120px;
+                padding: 0.5rem;
+                font-size: 0.75rem;
+            }
+            header button {
+                padding: 0.5rem;
+                font-size: 0.75rem;
+            }
+            header button span:not(#theme-icon) {
+                display: none;
+            }
+            .grid.lg\:grid-cols-3 {
+                grid-template-columns: 1fr;
+            }
+            .lg\:col-span-2 {
+                grid-column: span 1;
+            }
+            #map-container {
+                height: 300px !important;
+            }
+            .resource-card {
+                padding: 0.75rem;
+            }
+            .resource-card .text-2xl {
+                font-size: 1.25rem;
+            }
+            .resource-card .text-sm {
+                font-size: 0.75rem;
+            }
+            .resource-card .text-xs {
+                font-size: 0.625rem;
+            }
+            .grid.grid-cols-2.md\:grid-cols-4.lg\:grid-cols-11 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            #ranking-select {
+                font-size: 0.875rem;
+            }
+            .overflow-x-auto table {
+                font-size: 0.75rem;
+            }
+            .flex-wrap.gap-4.text-sm {
+                gap: 0.5rem;
+                font-size: 0.625rem;
+            }
+            #compare-panel h2 {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .grid.grid-cols-2.md\:grid-cols-4.lg\:grid-cols-11 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            header button {
+                padding: 0.375rem;
+            }
+            #theme-btn, #compare-btn {
+                padding: 0.5rem;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) {
+            .country-path:hover {
+                filter: none;
+            }
+            .resource-card:hover {
+                transform: none;
+            }
+        }
     </style>
 </head>
 <body class="text-white">
+    <!-- Mobile Menu Toggle -->
+    <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden fixed bottom-4 right-4 z-50 w-12 h-12 bg-blue-600 rounded-full shadow-lg flex items-center justify-center text-xl">
+        📋
+    </button>
+
+    <!-- Mobile Side Panel -->
+    <div id="mobile-panel" class="fixed inset-y-0 right-0 w-80 bg-slate-900 z-40 transform translate-x-full transition-transform duration-300 md:hidden overflow-y-auto">
+        <div class="p-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold">國家詳情</h3>
+                <button onclick="toggleMobileMenu()" class="text-2xl">✕</button>
+            </div>
+            <div id="mobile-country-details">
+                <div class="text-slate-400 text-center py-8">
+                    <span class="text-4xl mb-2 block">👆</span>
+                    點擊地圖上的國家查看詳情
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div id="mobile-overlay" onclick="toggleMobileMenu()" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden"></div>
     <!-- Header -->
     <header class="glass-panel sticky top-0 z-50 border-b border-slate-700">
         <div class="max-w-7xl mx-auto px-4 py-4">
@@ -112,33 +222,35 @@
                 <div class="flex items-center gap-3">
                     <span class="text-3xl">🌍</span>
                     <div>
-                        <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                        <h1 class="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
                             全球天然資源地圖
                         </h1>
-                        <p class="text-sm text-slate-400">World Natural Resources Map 2025</p>
+                        <p class="text-xs md:text-sm text-slate-400 hidden sm:block">World Natural Resources Map 2025</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 md:gap-3">
                     <!-- Theme Toggle -->
-                    <button onclick="toggleTheme()" id="theme-btn" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition" title="切換主題">
+                    <button onclick="toggleTheme()" id="theme-btn" class="p-2 md:px-3 md:py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition" title="切換主題">
                         <span id="theme-icon">🌙</span>
                     </button>
                     <!-- Search Box -->
-                    <div class="relative">
+                    <div class="relative hidden sm:block">
                         <input type="text" id="country-search" placeholder="🔍 搜尋國家..." 
-                            class="px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 w-48 transition-all"
+                            class="px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 w-32 md:w-48 transition-all"
                             onkeyup="searchCountries(this.value)">
                         <div id="search-results" class="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-600 rounded-lg shadow-xl hidden z-50 max-h-60 overflow-y-auto"></div>
                     </div>
-                    <button onclick="toggleCompareMode()" id="compare-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                    <button onclick="toggleCompareMode()" id="compare-btn" class="p-2 md:px-4 md:py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition flex items-center gap-1 md:gap-2">
                         <span>📊</span>
-                        <span id="compare-btn-text">比較模式</span>
+                        <span id="compare-btn-text" class="hidden md:inline">比較模式</span>
                     </button>
-                    <button onclick="showAllResources()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition">
-                        顯示全部
+                    <button onclick="showAllResources()" class="p-2 md:px-4 md:py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition">
+                        <span class="md:hidden">👁️</span>
+                        <span class="hidden md:inline">顯示全部</span>
                     </button>
-                    <button onclick="resetView()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition">
-                        重置視圖
+                    <button onclick="resetView()" class="p-2 md:px-4 md:py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition">
+                        <span class="md:hidden">↺</span>
+                        <span class="hidden md:inline">重置視圖</span>
                     </button>
                 </div>
             </div>
@@ -178,61 +290,61 @@
             <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
                 <span>🏷️</span> 資源類型篩選
             </h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-11 gap-3">
-                <button onclick="filterResource('oil')" class="resource-card oil-gradient rounded-xl p-3 text-center">
-                    <div class="text-2xl mb-1">🛢️</div>
-                    <div class="text-sm font-medium">石油</div>
-                    <div class="text-xs text-white/70">Oil</div>
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-11 gap-2 md:gap-3">
+                <button onclick="filterResource('oil')" class="resource-card oil-gradient rounded-xl p-2 md:p-3 text-center">
+                    <div class="text-xl md:text-2xl mb-1">🛢️</div>
+                    <div class="text-xs md:text-sm font-medium">石油</div>
+                    <div class="text-[10px] md:text-xs text-white/70 hidden sm:block">Oil</div>
                 </button>
-                <button onclick="filterResource('gas')" class="resource-card gas-gradient rounded-xl p-3 text-center">
-                    <div class="text-2xl mb-1">🔥</div>
-                    <div class="text-sm font-medium">天然氣</div>
-                    <div class="text-xs text-white/70">Natural Gas</div>
+                <button onclick="filterResource('gas')" class="resource-card gas-gradient rounded-xl p-2 md:p-3 text-center">
+                    <div class="text-xl md:text-2xl mb-1">🔥</div>
+                    <div class="text-xs md:text-sm font-medium">天然氣</div>
+                    <div class="text-[10px] md:text-xs text-white/70 hidden sm:block">Gas</div>
                 </button>
-                <button onclick="filterResource('coal')" class="resource-card coal-gradient rounded-xl p-3 text-center">
-                    <div class="text-2xl mb-1">⬛</div>
-                    <div class="text-sm font-medium">煤炭</div>
-                    <div class="text-xs text-white/70">Coal</div>
+                <button onclick="filterResource('coal')" class="resource-card coal-gradient rounded-xl p-2 md:p-3 text-center">
+                    <div class="text-xl md:text-2xl mb-1">⬛</div>
+                    <div class="text-xs md:text-sm font-medium">煤炭</div>
+                    <div class="text-[10px] md:text-xs text-white/70 hidden sm:block">Coal</div>
                 </button>
-                <button onclick="filterResource('mineral')" class="resource-card mineral-gradient rounded-xl p-3 text-center">
-                    <div class="text-2xl mb-1">⛏️</div>
-                    <div class="text-sm font-medium">鐵礦/銅礦</div>
-                    <div class="text-xs text-white/70">Iron/Copper</div>
+                <button onclick="filterResource('mineral')" class="resource-card mineral-gradient rounded-xl p-2 md:p-3 text-center">
+                    <div class="text-xl md:text-2xl mb-1">⛏️</div>
+                    <div class="text-xs md:text-sm font-medium">鐵銅礦</div>
+                    <div class="text-[10px] md:text-xs text-white/70 hidden sm:block">Mineral</div>
                 </button>
-                <button onclick="filterResource('rare')" class="resource-card rare-gradient rounded-xl p-3 text-center">
-                    <div class="text-2xl mb-1">🔋</div>
-                    <div class="text-sm font-medium">稀土</div>
-                    <div class="text-xs text-white/70">Rare Earth</div>
+                <button onclick="filterResource('rare')" class="resource-card rare-gradient rounded-xl p-2 md:p-3 text-center">
+                    <div class="text-xl md:text-2xl mb-1">🔋</div>
+                    <div class="text-xs md:text-sm font-medium">稀土</div>
+                    <div class="text-[10px] md:text-xs text-white/70 hidden sm:block">Rare</div>
                 </button>
-                <button onclick="filterResource('gold')" class="resource-card gold-gradient rounded-xl p-3 text-center">
-                    <div class="text-2xl mb-1">👑</div>
-                    <div class="text-sm font-medium">黃金</div>
-                    <div class="text-xs text-white/70">Gold</div>
+                <button onclick="filterResource('gold')" class="resource-card gold-gradient rounded-xl p-2 md:p-3 text-center">
+                    <div class="text-xl md:text-2xl mb-1">👑</div>
+                    <div class="text-xs md:text-sm font-medium">黃金</div>
+                    <div class="text-[10px] md:text-xs text-white/70 hidden sm:block">Gold</div>
                 </button>
-                <button onclick="filterResource('silver')" class="resource-card silver-gradient rounded-xl p-3 text-center">
-                    <div class="text-2xl mb-1">🥈</div>
-                    <div class="text-sm font-medium">白銀</div>
-                    <div class="text-xs text-white/70">Silver</div>
+                <button onclick="filterResource('silver')" class="resource-card silver-gradient rounded-xl p-2 md:p-3 text-center">
+                    <div class="text-xl md:text-2xl mb-1">🥈</div>
+                    <div class="text-xs md:text-sm font-medium">白銀</div>
+                    <div class="text-[10px] md:text-xs text-white/70 hidden sm:block">Silver</div>
                 </button>
-                <button onclick="filterResource('diamond')" class="resource-card diamond-gradient rounded-xl p-3 text-center">
-                    <div class="text-2xl mb-1">💎</div>
-                    <div class="text-sm font-medium">鑽石</div>
-                    <div class="text-xs text-white/70">Diamond</div>
+                <button onclick="filterResource('diamond')" class="resource-card diamond-gradient rounded-xl p-2 md:p-3 text-center">
+                    <div class="text-xl md:text-2xl mb-1">💎</div>
+                    <div class="text-xs md:text-sm font-medium">鑽石</div>
+                    <div class="text-[10px] md:text-xs text-white/70 hidden sm:block">Diamond</div>
                 </button>
-                <button onclick="filterResource('lithium')" class="resource-card lithium-gradient rounded-xl p-3 text-center">
-                    <div class="text-2xl mb-1">🔋</div>
-                    <div class="text-sm font-medium">鋰礦</div>
-                    <div class="text-xs text-white/70">Lithium</div>
+                <button onclick="filterResource('lithium')" class="resource-card lithium-gradient rounded-xl p-2 md:p-3 text-center">
+                    <div class="text-xl md:text-2xl mb-1">🔋</div>
+                    <div class="text-xs md:text-sm font-medium">鋰礦</div>
+                    <div class="text-[10px] md:text-xs text-white/70 hidden sm:block">Lithium</div>
                 </button>
-                <button onclick="filterResource('nickel')" class="resource-card nickel-gradient rounded-xl p-3 text-center">
-                    <div class="text-2xl mb-1">⚙️</div>
-                    <div class="text-sm font-medium">鎳礦</div>
-                    <div class="text-xs text-white/70">Nickel</div>
+                <button onclick="filterResource('nickel')" class="resource-card nickel-gradient rounded-xl p-2 md:p-3 text-center">
+                    <div class="text-xl md:text-2xl mb-1">⚙️</div>
+                    <div class="text-xs md:text-sm font-medium">鎳礦</div>
+                    <div class="text-[10px] md:text-xs text-white/70 hidden sm:block">Nickel</div>
                 </button>
-                <button onclick="filterResource('phosphate')" class="resource-card phosphate-gradient rounded-xl p-3 text-center">
-                    <div class="text-2xl mb-1">🧪</div>
-                    <div class="text-sm font-medium">磷酸鹽</div>
-                    <div class="text-xs text-white/70">Phosphate</div>
+                <button onclick="filterResource('phosphate')" class="resource-card phosphate-gradient rounded-xl p-2 md:p-3 text-center">
+                    <div class="text-xl md:text-2xl mb-1">🧪</div>
+                    <div class="text-xs md:text-sm font-medium">磷酸鹽</div>
+                    <div class="text-[10px] md:text-xs text-white/70 hidden sm:block">Phosphate</div>
                 </button>
             </div>
         </div>
@@ -241,42 +353,42 @@
         <div class="grid lg:grid-cols-3 gap-6">
             <!-- Map Section -->
             <div class="lg:col-span-2">
-                <div class="glass-panel rounded-2xl p-6">
-                    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                <div class="glass-panel rounded-2xl p-4 md:p-6">
+                    <h2 class="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
                         <span>🗺️</span> 資源分布地圖
                     </h2>
-                    <div id="map-container" class="relative rounded-xl overflow-hidden bg-slate-900" style="height: 500px;">
+                    <div id="map-container" class="relative rounded-xl overflow-hidden bg-slate-900" style="height: 300px;">
                         <svg id="world-map" width="100%" height="100%"></svg>
                         <div id="tooltip" class="tooltip hidden"></div>
                     </div>
-                    <div class="mt-4 flex flex-wrap gap-4 text-sm text-slate-400">
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-red-600"></span> 石油
+                    <div class="mt-4 flex flex-wrap gap-2 md:gap-4 text-xs md:text-sm text-slate-400">
+                        <div class="flex items-center gap-1 md:gap-2">
+                            <span class="w-2 h-2 md:w-3 md:h-3 rounded-full bg-red-600"></span> 石油
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-amber-500"></span> 天然氣
+                        <div class="flex items-center gap-1 md:gap-2">
+                            <span class="w-2 h-2 md:w-3 md:h-3 rounded-full bg-amber-500"></span> 天然氣
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-gray-600"></span> 煤炭
+                        <div class="flex items-center gap-1 md:gap-2">
+                            <span class="w-2 h-2 md:w-3 md:h-3 rounded-full bg-gray-600"></span> 煤炭
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-purple-600"></span> 鐵/銅礦
+                        <div class="flex items-center gap-1 md:gap-2">
+                            <span class="w-2 h-2 md:w-3 md:h-3 rounded-full bg-purple-600"></span> 鐵/銅礦
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-cyan-500"></span> 稀土
+                        <div class="flex items-center gap-1 md:gap-2">
+                            <span class="w-2 h-2 md:w-3 md:h-3 rounded-full bg-cyan-500"></span> 稀土
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-yellow-500"></span> 黃金
+                        <div class="flex items-center gap-1 md:gap-2">
+                            <span class="w-2 h-2 md:w-3 md:h-3 rounded-full bg-yellow-500"></span> 黃金
                         </div>
                     </div>
                 </div>
 
                 <!-- Charts Section -->
-                <div class="glass-panel rounded-2xl p-6 mt-6">
-                    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                <div class="glass-panel rounded-2xl p-4 md:p-6 mt-4 md:mt-6">
+                    <h2 class="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
                         <span>📈</span> 資源統計圖表
                     </h2>
-                    <div class="grid md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <canvas id="resource-type-chart"></canvas>
                         </div>
@@ -2754,6 +2866,38 @@
                 });
             }
         }
+
+        // Mobile menu functionality
+        function toggleMobileMenu() {
+            const panel = document.getElementById('mobile-panel');
+            const overlay = document.getElementById('mobile-overlay');
+            
+            if (panel.classList.contains('translate-x-full')) {
+                panel.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                panel.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Override showCountryDetails for mobile
+        const originalShowCountryDetails = showCountryDetails;
+        showCountryDetails = function(countryName) {
+            originalShowCountryDetails(countryName);
+            
+            // On mobile, also update mobile panel and open it
+            if (window.innerWidth < 768) {
+                const mobileContainer = document.getElementById('mobile-country-details');
+                const desktopContainer = document.getElementById('country-details');
+                if (mobileContainer && desktopContainer) {
+                    mobileContainer.innerHTML = desktopContainer.innerHTML;
+                    toggleMobileMenu();
+                }
+            }
+        };
 
         // Theme toggle functionality
         let isDarkTheme = true;
