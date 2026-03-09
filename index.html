@@ -1588,7 +1588,19 @@
                 lumber: '#22c55e',
                 lithium: '#14b8a6',
                 nickel: '#6366f1',
-                phosphate: '#f97316'
+                phosphate: '#f97316',
+                cobalt: '#3b82f6',
+                uranium: '#22c55e',
+                bauxite: '#92400e',
+                zinc: '#a855f7',
+                copper: '#f97316',
+                iron: '#ea580c',
+                tin: '#64748b',
+                potash: '#ec4899',
+                graphite: '#9ca3af',
+                forest: '#16a34a',
+                platinum: '#e5e7eb',
+                palladium: '#d1d5db'
             };
             return colors[type] || '#94a3b8';
         }
@@ -1596,7 +1608,7 @@
         function showCountryDetails(countryName) {
             const data = resourceData[countryName];
             const container = document.getElementById('country-details');
-            
+
             if (!data) {
                 container.innerHTML = `
                     <div class="text-slate-400 text-center py-8">
@@ -1606,28 +1618,257 @@
                 `;
                 return;
             }
-            
+
             const resourceIcons = {
                 oil: '🛢️', gas: '🔥', coal: '⬛', mineral: '⛏️',
                 rare: '🔋', gold: '👑', silver: '🥈', diamond: '💎',
-                lumber: '🌲', lithium: '🔋', nickel: '⚙️', phosphate: '🧪'
+                lumber: '🌲', lithium: '🔋', nickel: '⚙️', phosphate: '🧪',
+                cobalt: '🔷', uranium: '☢️', bauxite: '🟤', zinc: '⚡',
+                copper: '🟠', iron: '🔩', tin: '🔲', potash: '🧂',
+                graphite: '⬜', forest: '🌲', platinum: '💿', palladium: '💽'
             };
-            
+
             const resourceNames = {
                 oil: '石油', gas: '天然氣', coal: '煤炭', mineral: '鐵/銅礦',
                 rare: '稀土', gold: '黃金', silver: '白銀', diamond: '鑽石',
-                lumber: '木材', lithium: '鋰礦', nickel: '鎳礦', phosphate: '磷酸鹽'
+                lumber: '木材', lithium: '鋰礦', nickel: '鎳礦', phosphate: '磷酸鹽',
+                cobalt: '鈷礦', uranium: '鈾礦', bauxite: '鋁土礦', zinc: '鋅礦',
+                copper: '銅礦', iron: '鐵礦', tin: '錫礦', potash: '鉀鹽',
+                graphite: '石墨', forest: '森林', platinum: '白金', palladium: '鈀金'
             };
-            
+
+            // 生成資源儲量表格
+            const reserveRows = [];
+
+            if (data.oilReserves) {
+                reserveRows.push({
+                    icon: '🛢️',
+                    label: '石油儲量',
+                    value: `${data.oilReserves} ${data.oilReservesUnit || '十億桶'}`,
+                    global: data.oilReservesGlobal || '',
+                    color: 'text-red-400'
+                });
+            }
+
+            if (data.gasReserves) {
+                reserveRows.push({
+                    icon: '🔥',
+                    label: '天然氣儲量',
+                    value: `${data.gasReserves} ${data.gasReservesUnit || '兆立方英尺'}`,
+                    global: data.gasReservesGlobal || '',
+                    color: 'text-amber-400'
+                });
+            }
+
+            if (data.coalReserves) {
+                reserveRows.push({
+                    icon: '⬛',
+                    label: '煤炭儲量',
+                    value: `${data.coalReserves} ${data.coalReservesUnit || '億噸'}`,
+                    global: data.coalReservesGlobal || '',
+                    color: 'text-gray-400'
+                });
+            }
+
+            if (data.ironOreReserves) {
+                reserveRows.push({
+                    icon: '🔩',
+                    label: '鐵礦石儲量',
+                    value: `${data.ironOreReserves} ${data.ironOreReservesUnit || '億噸'}`,
+                    global: data.ironOreReservesGlobal || '',
+                    color: 'text-orange-400'
+                });
+            }
+
+            if (data.copperReserves) {
+                reserveRows.push({
+                    icon: '🟠',
+                    label: '銅礦儲量',
+                    value: `${data.copperReserves} ${data.copperReservesUnit || '萬噸'}`,
+                    global: data.copperReservesGlobal || '',
+                    color: 'text-orange-500'
+                });
+            }
+
+            if (data.goldReserves) {
+                reserveRows.push({
+                    icon: '👑',
+                    label: '黃金儲量',
+                    value: `${data.goldReserves} ${data.goldReservesUnit || '噸'}`,
+                    global: data.goldReservesGlobal || '',
+                    color: 'text-yellow-400'
+                });
+            }
+
+            if (data.silverReserves) {
+                reserveRows.push({
+                    icon: '🥈',
+                    label: '白銀儲量',
+                    value: `${data.silverReserves} ${data.silverReservesUnit || '噸'}`,
+                    global: data.silverReservesGlobal || '',
+                    color: 'text-slate-300'
+                });
+            }
+
+            if (data.diamondReserves) {
+                reserveRows.push({
+                    icon: '💎',
+                    label: '鑽石儲量',
+                    value: `${data.diamondReserves} ${data.diamondReservesUnit || '萬克拉'}`,
+                    global: data.diamondReservesGlobal || '',
+                    color: 'text-pink-400'
+                });
+            }
+
+            if (data.lithiumReserves) {
+                reserveRows.push({
+                    icon: '🔋',
+                    label: '鋰礦儲量',
+                    value: `${data.lithiumReserves} ${data.lithiumReservesUnit || '萬噸'}`,
+                    global: data.lithiumReservesGlobal || '',
+                    color: 'text-teal-400'
+                });
+            }
+
+            if (data.nickelReserves) {
+                reserveRows.push({
+                    icon: '⚙️',
+                    label: '鎳礦儲量',
+                    value: `${data.nickelReserves} ${data.nickelReservesUnit || '萬噸'}`,
+                    global: data.nickelReservesGlobal || '',
+                    color: 'text-indigo-400'
+                });
+            }
+
+            if (data.cobaltReserves) {
+                reserveRows.push({
+                    icon: '🔷',
+                    label: '鈷礦儲量',
+                    value: `${data.cobaltReserves} ${data.cobaltReservesUnit || '萬噸'}`,
+                    global: data.cobaltReservesGlobal || '',
+                    color: 'text-blue-400'
+                });
+            }
+
+            if (data.rareEarthReserves) {
+                reserveRows.push({
+                    icon: '🔋',
+                    label: '稀土儲量',
+                    value: `${data.rareEarthReserves} ${data.rareEarthReservesUnit || '萬噸'}`,
+                    global: data.rareEarthReservesGlobal || '',
+                    color: 'text-cyan-400'
+                });
+            }
+
+            if (data.bauxiteReserves) {
+                reserveRows.push({
+                    icon: '🟤',
+                    label: '鋁土礦儲量',
+                    value: `${data.bauxiteReserves} ${data.bauxiteReservesUnit || '億噸'}`,
+                    global: data.bauxiteReservesGlobal || '',
+                    color: 'text-amber-600'
+                });
+            }
+
+            if (data.phosphateReserves) {
+                reserveRows.push({
+                    icon: '🧪',
+                    label: '磷酸鹽儲量',
+                    value: `${data.phosphateReserves} ${data.phosphateReservesUnit || '億噸'}`,
+                    global: data.phosphateReservesGlobal || '',
+                    color: 'text-orange-500'
+                });
+            }
+
+            if (data.uraniumReserves) {
+                reserveRows.push({
+                    icon: '☢️',
+                    label: '鈾礦儲量',
+                    value: `${data.uraniumReserves} ${data.uraniumReservesUnit || '萬噸'}`,
+                    global: data.uraniumReservesGlobal || '',
+                    color: 'text-green-400'
+                });
+            }
+
+            if (data.zincReserves) {
+                reserveRows.push({
+                    icon: '⚡',
+                    label: '鋅礦儲量',
+                    value: `${data.zincReserves} ${data.zincReservesUnit || '萬噸'}`,
+                    global: data.zincReservesGlobal || '',
+                    color: 'text-purple-400'
+                });
+            }
+
+            if (data.graphiteReserves) {
+                reserveRows.push({
+                    icon: '⬜',
+                    label: '石墨儲量',
+                    value: `${data.graphiteReserves} ${data.graphiteReservesUnit || '萬噸'}`,
+                    global: data.graphiteReservesGlobal || '',
+                    color: 'text-gray-300'
+                });
+            }
+
+            if (data.forestArea) {
+                reserveRows.push({
+                    icon: '🌲',
+                    label: '森林面積',
+                    value: `${data.forestArea} ${data.forestAreaUnit || '億公頃'}`,
+                    global: data.forestAreaGlobal || '',
+                    color: 'text-green-500'
+                });
+            }
+
+            if (data.platinumReserves) {
+                reserveRows.push({
+                    icon: '💿',
+                    label: '白金儲量',
+                    value: `${data.platinumReserves} ${data.platinumReservesUnit || ''}`,
+                    global: data.platinumReservesGlobal || '',
+                    color: 'text-slate-200'
+                });
+            }
+
+            if (data.potashReserves) {
+                reserveRows.push({
+                    icon: '🧂',
+                    label: '鉀鹽儲量',
+                    value: `${data.potashReserves} ${data.potashReservesUnit || '億噸'}`,
+                    global: data.potashReservesGlobal || '',
+                    color: 'text-pink-300'
+                });
+            }
+
+            const reservesTable = reserveRows.length > 0 ? `
+                <div class="mt-4">
+                    <h4 class="text-sm font-semibold text-slate-300 mb-3">📊 資源儲量詳情</h4>
+                    <div class="bg-slate-800/50 rounded-lg overflow-hidden">
+                        ${reserveRows.map(row => `
+                            <div class="flex items-center justify-between px-3 py-2 border-b border-slate-700/50 last:border-0">
+                                <div class="flex items-center gap-2">
+                                    <span>${row.icon}</span>
+                                    <span class="text-sm text-slate-400">${row.label}</span>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-semibold ${row.color}">${row.value}</div>
+                                    ${row.global ? `<div class="text-xs text-slate-500">全球占比: ${row.global}</div>` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : '';
+
             container.innerHTML = `
                 <div class="border-b border-slate-700 pb-4 mb-4">
                     <h3 class="text-xl font-bold text-white">${data.name}</h3>
                     <p class="text-slate-400 text-sm mt-1">${data.description}</p>
                 </div>
-                
-                <div class="space-y-3">
+
+                <div class="space-y-4">
                     <div>
-                        <h4 class="text-sm font-semibold text-slate-300 mb-2">主要資源</h4>
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">🏷️ 主要資源類型</h4>
                         <div class="flex flex-wrap gap-2">
                             ${data.resources.map(r => `
                                 <span class="px-3 py-1 rounded-full text-sm" style="background: ${getResourceColor(r)}33; color: ${getResourceColor(r)}; border: 1px solid ${getResourceColor(r)}">
@@ -1636,36 +1877,32 @@
                             `).join('')}
                         </div>
                     </div>
-                    
-                    ${data.oilReserves ? `
-                        <div class="flex justify-between items-center py-2 border-b border-slate-700/50">
-                            <span class="text-slate-400">石油儲量</span>
-                            <span class="font-semibold text-red-400">${data.oilReserves}</span>
-                        </div>
-                    ` : ''}
-                    
-                    ${data.gasReserves ? `
-                        <div class="flex justify-between items-center py-2 border-b border-slate-700/50">
-                            <span class="text-slate-400">天然氣儲量</span>
-                            <span class="font-semibold text-amber-400">${data.gasReserves}</span>
-                        </div>
-                    ` : ''}
-                    
-                    ${data.coalReserves ? `
-                        <div class="flex justify-between items-center py-2 border-b border-slate-700/50">
-                            <span class="text-slate-400">煤炭儲量</span>
-                            <span class="font-semibold text-gray-400">${data.coalReserves}</span>
-                        </div>
-                    ` : ''}
-                    
-                    <div>
-                        <h4 class="text-sm font-semibold text-slate-300 mb-2">主要出口國</h4>
+
+                    ${reservesTable}
+
+                    <div class="mt-4 pt-4 border-t border-slate-700/50">
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">🚢 主要出口流向</h4>
                         <div class="flex flex-wrap gap-2">
-                            ${data.mainExports.map(exp => `
+                            ${Array.isArray(data.mainExports) ? data.mainExports.map(exp => `
                                 <span class="px-2 py-1 bg-slate-700 rounded text-xs text-slate-300">${exp}</span>
-                            `).join('')}
+                            `).join('') : `<span class="px-2 py-1 bg-slate-700 rounded text-xs text-slate-300">${data.mainExports}</span>`}
                         </div>
                     </div>
+
+                    ${data.dataYear ? `
+                        <div class="mt-4 pt-3 border-t border-slate-700/50">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-slate-500">📅 資料年份</span>
+                                <span class="text-slate-400">${data.dataYear}</span>
+                            </div>
+                            ${data.dataSource ? `
+                                <div class="flex items-center justify-between text-xs mt-1">
+                                    <span class="text-slate-500">📚 資料來源</span>
+                                    <span class="text-slate-400">${data.dataSource}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    ` : ''}
                 </div>
             `;
         }
