@@ -257,28 +257,30 @@
         </div>
     </header>
 
-    <!-- Data Sources Banner -->
-    <div class="bg-slate-800/50 border-b border-slate-700">
-        <div class="max-w-7xl mx-auto px-4 py-3">
-            <div class="flex flex-wrap items-center gap-4 text-sm">
-                <div class="flex items-center gap-2 text-slate-300">
+    <!-- Data Sources Banner - Fixed -->
+    <div class="bg-slate-800/80 border-b border-slate-700 sticky top-[60px] z-40 backdrop-blur-sm">
+        <div class="max-w-7xl mx-auto px-4 py-2">
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+                <div class="flex items-center gap-1 text-slate-300">
                     <span class="text-blue-400">📊</span>
                     <span class="font-medium">資料來源：</span>
                 </div>
-                <div class="flex flex-wrap gap-3">
-                    <a href="https://www.energyinst.org/statistical-review" target="_blank" rel="noopener" class="px-3 py-1 bg-slate-700/50 hover:bg-slate-700 rounded-full text-slate-300 hover:text-white transition text-xs flex items-center gap-1">
+                <div class="flex flex-wrap gap-2">
+                    <a href="https://www.energyinst.org/statistical-review" target="_blank" rel="noopener" class="px-2 py-1 bg-blue-600/20 hover:bg-blue-600/30 rounded text-blue-300 hover:text-blue-200 transition flex items-center gap-1 border border-blue-500/30">
                         <span>🛢️</span> BP Statistical Review 2024
                     </a>
-                    <a href="https://www.usgs.gov/centers/national-minerals-information-center" target="_blank" rel="noopener" class="px-3 py-1 bg-slate-700/50 hover:bg-slate-700 rounded-full text-slate-300 hover:text-white transition text-xs flex items-center gap-1">
+                    <a href="https://pubs.usgs.gov/periodicals/mcs2025/" target="_blank" rel="noopener" class="px-2 py-1 bg-emerald-600/20 hover:bg-emerald-600/30 rounded text-emerald-300 hover:text-emerald-200 transition flex items-center gap-1 border border-emerald-500/30">
                         <span>⛏️</span> USGS Mineral Commodity Summaries 2025
                     </a>
-                    <a href="https://www.iea.org/reports/world-energy-outlook-2024" target="_blank" rel="noopener" class="px-3 py-1 bg-slate-700/50 hover:bg-slate-700 rounded-full text-slate-300 hover:text-white transition text-xs flex items-center gap-1">
+                    <a href="https://www.iea.org/reports/world-energy-outlook-2024" target="_blank" rel="noopener" class="px-2 py-1 bg-amber-600/20 hover:bg-amber-600/30 rounded text-amber-300 hover:text-amber-200 transition flex items-center gap-1 border border-amber-500/30">
                         <span>🔋</span> IEA World Energy Outlook 2024
                     </a>
                 </div>
                 <div class="ml-auto flex items-center gap-2 text-xs text-slate-400">
                     <span>🕒</span>
-                    <span>資料更新於 2025年3月</span>
+                    <span>更新：2025年3月</span>
+                    <span class="text-slate-600">|</span>
+                    <span>📋 可點擊查看原始報告</span>
                 </div>
             </div>
         </div>
@@ -483,7 +485,15 @@
                 dataYear: '2024',
                 dataSource: 'BP Statistical Review 2024',
                 mainExports: ['中國', '日本', '印度', '韓國', '美國'],
-                description: '全球第二大石油儲量國，OPEC核心成員',
+                mainImports: ['機械設備', '交通工具', '化工產品', '食品', '紡織品'],
+                importSources: {
+                    '機械設備': ['中國(18%)', '美國(15%)', '德國(12%)', '日本(10%)', '韓國(8%)'],
+                    '交通工具': ['日本(22%)', '美國(18%)', '德國(15%)', '韓國(12%)', '中國(8%)'],
+                    '化工產品': ['中國(20%)', '美國(15%)', '德國(12%)', '印度(8%)'],
+                    '食品': ['巴西(15%)', '印度(12%)', '澳洲(10%)', '紐西蘭(8%)', '美國(8%)'],
+                    '紡織品': ['中國(35%)', '印度(15%)', '孟加拉(12%)', '土耳其(8%)']
+                },
+                description: '全球第二大石油儲量國，OPEC核心成員。雖為石油出口大國，但工業品高度依賴進口',
                 color: '#dc2626'
             },
             'Iran': {
@@ -566,7 +576,16 @@
                 dataYear: '2024',
                 dataSource: 'BP Statistical Review 2024',
                 mainExports: ['中國', '德國', '荷蘭', '白俄羅斯', '土耳其'],
-                description: '全球最大天然氣出口國，天然氣儲量全球第1',
+                mainImports: ['機械設備', '電子產品', '交通工具', '化工產品', '食品', '紡織品'],
+                importSources: {
+                    '機械設備': ['中國(32%)', '德國(18%)', '美國(12%)', '日本(8%)', '韓國(6%)'],
+                    '電子產品': ['中國(35%)', '韓國(15%)', '日本(12%)', '美國(8%)', '德國(6%)'],
+                    '交通工具': ['中國(25%)', '日本(18%)', '德國(15%)', '韓國(12%)', '美國(8%)'],
+                    '化工產品': ['中國(22%)', '德國(18%)', '美國(12%)', '法國(8%)'],
+                    '食品': ['巴西(15%)', '阿根廷(12%)', '土耳其(10%)', '中國(8%)', '厄瓜多(6%)'],
+                    '紡織品': ['中國(45%)', '孟加拉(15%)', '越南(12%)', '土耳其(8%)', '印度(6%)']
+                },
+                description: '全球最大天然氣出口國，天然氣儲量全球第1。工業製成品高度依賴進口',
                 color: '#7c3aed'
             },
             
@@ -583,7 +602,18 @@
                 dataYear: '2024',
                 dataSource: 'BP Statistical Review 2024',
                 mainExports: ['加拿大', '墨西哥', '中國', '日本', '韓國'],
-                description: '全球最大石油生產國（頁岩革命），第9大儲量國',
+                mainImports: ['石油', '天然氣', '鈾礦', '稀土', '鋰礦', '石墨', '錳礦'],
+                importSources: {
+                    '石油': ['加拿大(61%)', '墨西哥(12%)', '沙烏地阿拉伯(8%)', '哥倫比亞(5%)', '伊拉克(4%)'],
+                    '天然氣': ['加拿大(99%)'],
+                    '鈾礦': ['哈薩克(35%)', '加拿大(28%)', '澳洲(18%)', '俄羅斯(12%)'],
+                    '稀土': ['中國(78%)', '愛沙尼亞(8%)', '馬來西亞(5%)', '法國(4%)'],
+                    '鋰礦': ['阿根廷(32%)', '智利(28%)', '澳洲(22%)', '中國(12%)'],
+                    '石墨': ['中國(35%)', '莫三比克(18%)', '馬達加斯加(12%)', '加拿大(10%)'],
+                    '錳礦': ['南非(42%)', '加彭(22%)', '澳洲(12%)', '巴西(8%)']
+                },
+                energyImportDependency: '12.8%',
+                description: '全球最大石油生產國（頁岩革命），第9大儲量國。雖然是淨出口國，但仍需進口特定等級原油和關鍵礦產',
                 color: '#7c3aed'
             },
             
@@ -724,7 +754,16 @@
                 dataYear: '2025',
                 dataSource: 'USGS Mineral Commodity Summaries 2025',
                 mainExports: ['中國', '日本', '韓國', '印度', '台灣'],
-                description: '全球最大鐵礦石出口國，鋰礦儲量全球第2',
+                mainImports: ['機械設備', '交通工具', '電子產品', '化工產品', '紡織品', '石油製品'],
+                importSources: {
+                    '機械設備': ['中國(22%)', '美國(18%)', '德國(12%)', '日本(10%)'],
+                    '交通工具': ['日本(25%)', '德國(18%)', '美國(12%)', '韓國(10%)', '中國(8%)'],
+                    '電子產品': ['中國(28%)', '美國(15%)', '日本(12%)', '韓國(10%)', '德國(8%)'],
+                    '化工產品': ['中國(18%)', '美國(15%)', '德國(12%)', '日本(10%)'],
+                    '紡織品': ['中國(45%)', '孟加拉(15%)', '越南(12%)', '印度(8%)'],
+                    '石油製品': ['新加坡(22%)', '韓國(18%)', '日本(12%)', '中國(10%)']
+                },
+                description: '全球最大鐵礦石出口國，鋰礦儲量全球第2。工業製成品高度依賴進口',
                 color: '#eab308'
             },
             
@@ -739,7 +778,16 @@
                 dataYear: '2024/2025',
                 dataSource: 'BP Statistical Review 2024 / USGS 2025',
                 mainExports: ['中國', '日本', '荷蘭', '韓國', '德國'],
-                description: '全球第二大鐵礦石出口國，亞馬遜雨林木材',
+                mainImports: ['機械設備', '電子產品', '交通工具', '化工產品', '石油製品', '肥料'],
+                importSources: {
+                    '機械設備': ['中國(28%)', '美國(22%)', '德國(15%)', '日本(10%)', '義大利(8%)'],
+                    '電子產品': ['中國(32%)', '美國(18%)', '韓國(12%)', '日本(10%)', '德國(8%)'],
+                    '交通工具': ['阿根廷(28%)', '墨西哥(18%)', '韓國(15%)', '日本(12%)', '德國(10%)'],
+                    '化工產品': ['中國(22%)', '美國(20%)', '德國(15%)', '阿根廷(10%)'],
+                    '石油製品': ['美國(35%)', '印度(18%)', '荷蘭(12%)', '新加坡(10%)'],
+                    '肥料': ['俄羅斯(22%)', '中國(18%)', '加拿大(15%)', '摩洛哥(12%)']
+                },
+                description: '全球第二大鐵礦石出口國，亞馬遜雨林木材。工業製成品高度依賴進口',
                 color: '#22c55e'
             },
             
@@ -767,7 +815,15 @@
                 dataYear: '2024',
                 dataSource: 'BP Statistical Review 2024',
                 mainExports: ['美國', '中國', '英國', '日本', '墨西哥'],
-                description: '油砂資源豐富，石油儲量全球第4',
+                mainImports: ['機械設備', '交通工具', '電子產品', '化工產品', '紡織品'],
+                importSources: {
+                    '機械設備': ['美國(45%)', '中國(18%)', '德國(12%)', '日本(8%)', '墨西哥(6%)'],
+                    '交通工具': ['美國(35%)', '日本(18%)', '墨西哥(12%)', '德國(10%)', '韓國(8%)'],
+                    '電子產品': ['中國(28%)', '美國(22%)', '墨西哥(15%)', '日本(12%)', '韓國(8%)'],
+                    '化工產品': ['美國(42%)', '中國(15%)', '德國(12%)', '英國(8%)'],
+                    '紡織品': ['中國(42%)', '孟加拉(15%)', '越南(12%)', '印度(8%)', '美國(6%)']
+                },
+                description: '油砂資源豐富，石油儲量全球第4。工業製成品主要從美國和中國進口',
                 color: '#dc2626'
             },
             
