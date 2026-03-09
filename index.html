@@ -2227,20 +2227,36 @@
 
             const reservesTable = reserveRows.length > 0 ? `
                 <div class="mt-4">
-                    <h4 class="text-sm font-semibold text-slate-300 mb-3">📊 資源儲量詳情</h4>
-                    <div class="bg-slate-800/50 rounded-lg overflow-hidden">
-                        ${reserveRows.map(row => `
-                            <div class="flex items-center justify-between px-3 py-2 border-b border-slate-700/50 last:border-0">
-                                <div class="flex items-center gap-2">
-                                    <span>${row.icon}</span>
-                                    <span class="text-sm text-slate-400">${row.label}</span>
-                                </div>
-                                <div class="text-right">
-                                    <div class="font-semibold ${row.color}">${row.value}</div>
-                                    ${row.global ? `<div class="text-xs text-slate-500">全球占比: ${row.global}</div>` : ''}
-                                </div>
-                            </div>
-                        `).join('')}
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-sm font-semibold text-slate-300">📊 資源儲量詳情</h4>
+                        <button onclick="copyCountryData('${data.name}')" class="text-xs px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-slate-300 transition flex items-center gap-1">
+                            📋 複製數據
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr class="bg-slate-700/50 text-slate-300">
+                                    <th class="px-3 py-2 text-left rounded-tl-lg">資源類型</th>
+                                    <th class="px-3 py-2 text-right">儲量</th>
+                                    <th class="px-3 py-2 text-right rounded-tr-lg">全球占比</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${reserveRows.map((row, index) => `
+                                    <tr class="border-b border-slate-700/50 ${index % 2 === 0 ? 'bg-slate-800/30' : ''}">
+                                        <td class="px-3 py-2">
+                                            <div class="flex items-center gap-2">
+                                                <span>${row.icon}</span>
+                                                <span class="text-slate-300">${row.label.replace('儲量', '')}</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-3 py-2 text-right font-mono ${row.color}">${row.value}</td>
+                                        <td class="px-3 py-2 text-right text-slate-400">${row.global || '-'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             ` : '';
@@ -3101,6 +3117,41 @@
                 }
             }
         };
+
+        // Copy country data to clipboard
+        function copyCountryData(countryName) {
+            const data = resourceData[countryName];
+            if (!data) return;
+
+            let csvContent = `國家,${data.name}\n`;
+            csvContent += `描述,${data.description}\n`;
+            csvContent += `資料年份,${data.dataYear || 'N/A'}\n`;
+            csvContent += `資料來源,${data.dataSource || 'N/A'}\n\n`;
+            csvContent += `資源類型,儲量,單位,全球占比\n`;
+
+            if (data.oilReserves) csvContent += `石油,${data.oilReserves},${data.oilReservesUnit || '十億桶'},${data.oilReservesGlobal || ''}\n`;
+            if (data.gasReserves) csvContent += `天然氣,${data.gasReserves},${data.gasReservesUnit || '兆立方英尺'},${data.gasReservesGlobal || ''}\n`;
+            if (data.coalReserves) csvContent += `煤炭,${data.coalReserves},${data.coalReservesUnit || '億噸'},${data.coalReservesGlobal || ''}\n`;
+            if (data.ironOreReserves) csvContent += `鐵礦石,${data.ironOreReserves},${data.ironOreReservesUnit || '億噸'},${data.ironOreReservesGlobal || ''}\n`;
+            if (data.copperReserves) csvContent += `銅礦,${data.copperReserves},${data.copperReservesUnit || '萬噸'},${data.copperReservesGlobal || ''}\n`;
+            if (data.goldReserves) csvContent += `黃金,${data.goldReserves},${data.goldReservesUnit || '噸'},${data.goldReservesGlobal || ''}\n`;
+            if (data.lithiumReserves) csvContent += `鋰礦,${data.lithiumReserves},${data.lithiumReservesUnit || '萬噸'},${data.lithiumReservesGlobal || ''}\n`;
+            if (data.nickelReserves) csvContent += `鎳礦,${data.nickelReserves},${data.nickelReservesUnit || '萬噸'},${data.nickelReservesGlobal || ''}\n`;
+
+            if (data.mainExports) {
+                csvContent += `\n主要出口,${Array.isArray(data.mainExports) ? data.mainExports.join(';') : data.mainExports}\n`;
+            }
+            if (data.mainImports) {
+                csvContent += `主要進口,${data.mainImports.join(';')}\n`;
+            }
+
+            navigator.clipboard.writeText(csvContent).then(() => {
+                alert(`✅ 已複製 ${data.name} 的數據到剪貼簿！\n\n可直接貼上到 Excel 或報告中。`);
+            }).catch(err => {
+                console.error('複製失敗:', err);
+                alert('複製失敗，請手動複製');
+            });
+        }
 
         // Theme toggle functionality
         let isDarkTheme = true;
