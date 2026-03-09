@@ -601,7 +601,106 @@
                 description: '全球稀土儲量和產量第一大國，掌控全球90%加工能力',
                 color: '#06b6d4'
             },
-            
+
+            // Taiwan - Major Importer
+            'Taiwan': {
+                name: '台灣',
+                resources: [],
+                mainImports: ['石油', '天然氣', '煤炭', '鐵礦石', '銅礦', '液化天然氣(LNG)', '鈾礦'],
+                importSources: {
+                    '石油': ['沙烏地阿拉伯(31%)', '科威特(21%)', '阿聯(12%)', '阿曼(8%)', '伊拉克(7%)'],
+                    '天然氣/LNG': ['卡達(27%)', '澳洲(26%)', '馬來西亞(14%)', '俄羅斯(10%)', '印尼(8%)'],
+                    '煤炭': ['澳洲(58%)', '印尼(28%)', '俄羅斯(8%)', '南非(4%)'],
+                    '鐵礦石': ['澳洲(67%)', '巴西(30%)', '南非(2%)'],
+                    '銅礦': ['智利(35%)', '秘魯(22%)', '澳洲(15%)', '印尼(12%)'],
+                    '鈾礦': ['澳洲(42%)', '加拿大(28%)', '哈薩克(18%)', '俄羅斯(8%)']
+                },
+                energyImportDependency: '97.8%',
+                dataYear: '2024',
+                dataSource: '經濟部能源統計月報 / BP Statistical Review 2024',
+                description: '全球第5大能源進口國，能源進口依存度高達97.8%，澳洲為最大供應國',
+                color: '#3b82f6'
+            },
+
+            // Japan - Major Importer
+            'Japan': {
+                name: '日本',
+                resources: [],
+                mainImports: ['石油', '天然氣/LNG', '煤炭', '鐵礦石', '銅礦', '鋰礦'],
+                importSources: {
+                    '石油': ['沙烏地阿拉伯(39%)', '阿聯(24%)', '卡達(10%)', '科威特(9%)', '俄羅斯(4%)'],
+                    '天然氣/LNG': ['澳洲(42%)', '馬來西亞(18%)', '卡達(12%)', '俄羅斯(9%)', '印尼(7%)'],
+                    '煤炭': ['澳洲(65%)', '印尼(18%)', '俄羅斯(12%)', '加拿大(3%)'],
+                    '鐵礦石': ['澳洲(62%)', '巴西(25%)', '南非(8%)', '加拿大(3%)'],
+                    '銅礦': ['智利(32%)', '秘魯(18%)', '印尼(15%)', '澳洲(12%)'],
+                    '鋰礦': ['智利(45%)', '澳洲(30%)', '阿根廷(15%)']
+                },
+                energyImportDependency: '94.5%',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024 / 日本經濟產業省',
+                description: '全球第3大能源進口國，澳洲為最大供應國，幾乎所有能源依賴進口',
+                color: '#ef4444'
+            },
+
+            // South Korea - Major Importer
+            'South Korea': {
+                name: '韓國',
+                resources: [],
+                mainImports: ['石油', '天然氣/LNG', '煤炭', '鐵礦石', '鈾礦'],
+                importSources: {
+                    '石油': ['沙烏地阿拉伯(32%)', '伊拉克(17%)', '科威特(12%)', '卡達(9%)', '阿聯(8%)'],
+                    '天然氣/LNG': ['卡達(23%)', '澳洲(21%)', '美國(17%)', '馬來西亞(12%)', '印尼(8%)'],
+                    '煤炭': ['澳洲(48%)', '印尼(26%)', '俄羅斯(16%)', '加拿大(6%)'],
+                    '鐵礦石': ['澳洲(58%)', '巴西(28%)', '南非(10%)'],
+                    '鈾礦': ['澳洲(38%)', '加拿大(25%)', '哈薩克(20%)', '俄羅斯(12%)']
+                },
+                energyImportDependency: '95.2%',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024 / 韓國能源經濟研究院',
+                description: '全球第4大能源進口國，能源進口依存度超過95%',
+                color: '#f97316'
+            },
+
+            // Germany - Major Importer
+            'Germany': {
+                name: '德國',
+                resources: ['coal'],
+                coalReserves: '褐煤豐富',
+                mainImports: ['石油', '天然氣', '煤炭', '鈾礦'],
+                importSources: {
+                    '石油': ['俄羅斯(戰前35%)', '荷蘭(18%)', '挪威(15%)', '英國(12%)', '美國(8%)'],
+                    '天然氣': ['俄羅斯(戰前55%)', '挪威(30%)', '荷蘭(12%)', '比利時(3%)'],
+                    '煤炭': ['俄羅斯(戰前45%)', '美國(20%)', '澳洲(15%)', '哥倫比亞(12%)'],
+                    '鈾礦': ['哈薩克(42%)', '加拿大(28%)', '澳洲(18%)', '俄羅斯(8%)']
+                },
+                energyImportDependency: '63.7%',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024 / 德國聯邦經濟部',
+                description: '歐洲最大經濟體，能源轉型中，戰前高度依賴俄羅斯能源',
+                color: '#eab308'
+            },
+
+            // India - Major Importer
+            'India': {
+                name: '印度',
+                resources: ['coal'],
+                coalReserves: '1,100',
+                coalReservesUnit: '億噸',
+                coalReservesGlobal: '10.3%',
+                mainImports: ['石油', '天然氣/LNG', '煤炭', '鈾礦'],
+                importSources: {
+                    '石油': ['伊拉克(27%)', '沙烏地阿拉伯(17%)', '阿聯(13%)', '美國(9%)', '俄羅斯(8%)'],
+                    '天然氣/LNG': ['卡達(48%)', '澳洲(12%)', '美國(10%)', '俄羅斯(8%)', '印尼(7%)'],
+                    '煤炭': ['印尼(36%)', '澳洲(33%)', '南非(15%)', '美國(8%)', '俄羅斯(5%)'],
+                    '鈾礦': ['哈薩克(45%)', '加拿大(22%)', '澳洲(18%)', '俄羅斯(10%)']
+                },
+                energyImportDependency: '38.5%',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024 / 印度石油規劃分析中心',
+                description: '全球第3大能源消費國，煤炭產量大但品質低，需進口高品質煤',
+                color: '#22c55e'
+            },
+
             // Australia - Iron, Coal, Gold, LNG
             'Australia': {
                 name: '澳洲',
@@ -2079,6 +2178,37 @@
                 </div>
             ` : '';
 
+            // Generate imports section if available
+            const importsSection = data.mainImports ? `
+                <div class="mt-4">
+                    <h4 class="text-sm font-semibold text-slate-300 mb-3">📥 主要進口資源</h4>
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        ${data.mainImports.map(imp => `
+                            <span class="px-3 py-1 rounded-full text-sm bg-blue-600/20 text-blue-400 border border-blue-600/50">
+                                📥 ${imp}
+                            </span>
+                        `).join('')}
+                    </div>
+                    ${data.energyImportDependency ? `
+                        <div class="bg-red-900/20 border border-red-600/30 rounded-lg p-3 mb-3">
+                            <div class="text-xs text-red-400 mb-1">⚠️ 能源進口依存度</div>
+                            <div class="text-lg font-bold text-red-400">${data.energyImportDependency}</div>
+                        </div>
+                    ` : ''}
+                    ${data.importSources ? `
+                        <div class="bg-slate-800/50 rounded-lg overflow-hidden">
+                            <div class="px-3 py-2 bg-slate-700/50 text-xs font-semibold text-slate-300">進口來源分布</div>
+                            ${Object.entries(data.importSources).map(([resource, sources]) => `
+                                <div class="px-3 py-2 border-b border-slate-700/50 last:border-0">
+                                    <div class="text-xs text-slate-400 mb-1">${resource}</div>
+                                    <div class="text-xs text-slate-300">${sources.join('、')}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            ` : '';
+
             container.innerHTML = `
                 <div class="border-b border-slate-700 pb-4 mb-4">
                     <h3 class="text-xl font-bold text-white">${data.name}</h3>
@@ -2086,27 +2216,33 @@
                 </div>
 
                 <div class="space-y-4">
-                    <div>
-                        <h4 class="text-sm font-semibold text-slate-300 mb-2">🏷️ 主要資源類型</h4>
-                        <div class="flex flex-wrap gap-2">
-                            ${data.resources.map(r => `
-                                <span class="px-3 py-1 rounded-full text-sm" style="background: ${getResourceColor(r)}33; color: ${getResourceColor(r)}; border: 1px solid ${getResourceColor(r)}">
-                                    ${resourceIcons[r]} ${resourceNames[r]}
-                                </span>
-                            `).join('')}
+                    ${data.resources && data.resources.length > 0 ? `
+                        <div>
+                            <h4 class="text-sm font-semibold text-slate-300 mb-2">🏷️ 主要資源類型</h4>
+                            <div class="flex flex-wrap gap-2">
+                                ${data.resources.map(r => `
+                                    <span class="px-3 py-1 rounded-full text-sm" style="background: ${getResourceColor(r)}33; color: ${getResourceColor(r)}; border: 1px solid ${getResourceColor(r)}">
+                                        ${resourceIcons[r]} ${resourceNames[r]}
+                                    </span>
+                                `).join('')}
+                            </div>
                         </div>
-                    </div>
+                    ` : ''}
 
                     ${reservesTable}
 
-                    <div class="mt-4 pt-4 border-t border-slate-700/50">
-                        <h4 class="text-sm font-semibold text-slate-300 mb-2">🚢 主要出口流向</h4>
-                        <div class="flex flex-wrap gap-2">
-                            ${Array.isArray(data.mainExports) ? data.mainExports.map(exp => `
-                                <span class="px-2 py-1 bg-slate-700 rounded text-xs text-slate-300">${exp}</span>
-                            `).join('') : `<span class="px-2 py-1 bg-slate-700 rounded text-xs text-slate-300">${data.mainExports}</span>`}
+                    ${importsSection}
+
+                    ${data.mainExports ? `
+                        <div class="mt-4 pt-4 border-t border-slate-700/50">
+                            <h4 class="text-sm font-semibold text-slate-300 mb-2">🚢 主要出口流向</h4>
+                            <div class="flex flex-wrap gap-2">
+                                ${Array.isArray(data.mainExports) ? data.mainExports.map(exp => `
+                                    <span class="px-2 py-1 bg-slate-700 rounded text-xs text-slate-300">${exp}</span>
+                                `).join('') : `<span class="px-2 py-1 bg-slate-700 rounded text-xs text-slate-300">${data.mainExports}</span>`}
+                            </div>
                         </div>
-                    </div>
+                    ` : ''}
 
                     ${data.dataYear ? `
                         <div class="mt-4 pt-3 border-t border-slate-700/50">
