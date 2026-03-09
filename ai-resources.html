@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 AI算力與關鍵資源供應鏈地圖 | AI Compute & Critical Resources Map</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/topojson@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .resource-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .resource-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        .country-path {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .country-path:hover {
+            filter: brightness(1.2);
+        }
+        .pulse-ring {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        /* AI Resource Gradients */
+        .copper-gradient { background: linear-gradient(135deg, #b45309, #92400e); }
+        .gallium-gradient { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
+        .germanium-gradient { background: linear-gradient(135deg, #64748b, #475569); }
+        .rare-gradient { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+        .lithium-gradient { background: linear-gradient(135deg, #14b8a6, #0d9488); }
+        .gas-gradient { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .oil-gradient { background: linear-gradient(135deg, #dc2626, #991b1b); }
+        .tooltip {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            pointer-events: none;
+            z-index: 1000;
+            max-width: 300px;
+        }
+        .energy-badge {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+        }
+        .mineral-badge {
+            background: linear-gradient(135deg, #7c3aed, #5b21b6);
+            border: 1px solid rgba(124, 58, 237, 0.5);
+        }
+    </style>
+</head>
+<body class="text-white">
+    <!-- Header -->
+    <header class="glass-panel sticky top-0 z-50 border-b border-slate-700">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl">🤖</span>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                            AI算力與關鍵資源供應鏈地圖
+                        </h1>
+                        <p class="text-xs md:text-sm text-slate-400">AI Compute & Critical Resources Supply Chain Map 2026</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 md:gap-3">
+                    <a href="https://ycc702-spec.github.io/world-resources-map/" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition">
+                        🌍 全球資源地圖
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Data Sources Banner - Fixed -->
+    <div class="bg-slate-800/90 border-b border-slate-700 sticky top-[60px] z-40 backdrop-blur-sm">
+        <div class="max-w-7xl mx-auto px-4 py-2">
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+                <div class="flex items-center gap-1 text-slate-300">
+                    <span class="text-blue-400">📊</span>
+                    <span class="font-medium">AI能源數據來源：</span>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <a href="https://www.iea.org/reports/energy-and-ai" target="_blank" rel="noopener" class="px-2 py-1 bg-blue-600/20 hover:bg-blue-600/30 rounded text-blue-300 hover:text-blue-200 transition flex items-center gap-1 border border-blue-500/30">
+                        <span>🔋</span> IEA Energy and AI 2025
+                    </a>
+                    <a href="https://www.bloomenergy.com/wp-content/uploads/2026-power-report.pdf" target="_blank" rel="noopener" class="px-2 py-1 bg-emerald-600/20 hover:bg-emerald-600/30 rounded text-emerald-300 hover:text-emerald-200 transition flex items-center gap-1 border border-emerald-500/30">
+                        <span>⚡</span> Bloom Energy 2026 Power Report
+                    </a>
+                    <a href="https://www.eia.gov/outlooks/steo/" target="_blank" rel="noopener" class="px-2 py-1 bg-amber-600/20 hover:bg-amber-600/30 rounded text-amber-300 hover:text-amber-200 transition flex items-center gap-1 border border-amber-500/30">
+                        <span>📈</span> EIA Short-Term Energy Outlook 2026
+                    </a>
+                </div>
+                <div class="ml-auto flex items-center gap-2 text-xs text-slate-400">
+                    <span>🕒</span>
+                    <span>能源數據更新於 2026年1月</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Context Banner -->
+    <div class="bg-gradient-to-r from-blue-900/50 via-purple-900/50 to-cyan-900/50 border-b border-slate-700">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">⚡</span>
+                    <div>
+                        <div class="text-sm font-semibold text-blue-300">AI資料中心電力需求</div>
+                        <div class="text-xs text-slate-400">預計2030年占全球電力消耗 3-4%</div>
+                    </div>
+                </div>
+                <div class="hidden md:block w-px h-8 bg-slate-600"></div>
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🔋</span>
+                    <div>
+                        <div class="text-sm font-semibold text-emerald-300">Bloom Energy SOFC</div>
+                        <div class="text-xs text-slate-400">現場發電燃料：天然氣為主</div>
+                    </div>
+                </div>
+                <div class="hidden md:block w-px h-8 bg-slate-600"></div>
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">📈</span>
+                    <div>
+                        <div class="text-sm font-semibold text-amber-300">天然氣需求成長</div>
+                        <div class="text-xs text-slate-400">美國資料中心帶動需求 +15%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resource Type Filter -->
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        <!-- Critical Minerals for AI -->
+        <div class="glass-panel rounded-2xl p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                <span class="mineral-badge px-2 py-1 rounded text-xs">礦產</span>
+                <span>🔬 AI晶片關鍵礦產</span>
+            </h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                <button onclick="filterResource('copper')" class="resource-card copper-gradient rounded-xl p-3 text-center">
+                    <div class="text-2xl mb-1">🔌</div>
+                    <div class="text-sm font-medium">銅礦</div>
+                    <div class="text-xs text-white/70">晶片導線</div>
+                </button>
+                <button onclick="filterResource('gallium')" class="resource-card gallium-gradient rounded-xl p-3 text-center">
+                    <div class="text-2xl mb-1">💜</div>
+                    <div class="text-sm font-medium">鎵</div>
+                    <div class="text-xs text-white/70">GaN晶片</div>
+                </button>
+                <button onclick="filterResource('germanium')" class="resource-card germanium-gradient rounded-xl p-3 text-center">
+                    <div class="text-2xl mb-1">🔘</div>
+                    <div class="text-sm font-medium">鍺</div>
+                    <div class="text-xs text-white/70">光纖/紅外</div>
+                </button>
+                <button onclick="filterResource('rare')" class="resource-card rare-gradient rounded-xl p-3 text-center">
+                    <div class="text-2xl mb-1">🧲</div>
+                    <div class="text-sm font-medium">稀土</div>
+                    <div class="text-xs text-white/70">磁鐵/雷射</div>
+                </button>
+                <button onclick="filterResource('lithium')" class="resource-card lithium-gradient rounded-xl p-3 text-center">
+                    <div class="text-2xl mb-1">🔋</div>
+                    <div class="text-sm font-medium">鋰礦</div>
+                    <div class="text-xs text-white/70">備援電池</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Energy Input for AI -->
+        <div class="glass-panel rounded-2xl p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                <span class="energy-badge px-2 py-1 rounded text-xs">能源輸入</span>
+                <span>⚡ AI資料中心能源</span>
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <button onclick="filterResource('gas')" class="resource-card gas-gradient rounded-xl p-4 text-left">
+                    <div class="flex items-center gap-3">
+                        <div class="text-3xl">🔥</div>
+                        <div>
+                            <div class="text-lg font-semibold">天然氣</div>
+                            <div class="text-sm text-blue-200">主要現場發電燃料</div>
+                            <div class="text-xs text-blue-300/70 mt-1">Bloom Energy SOFC 燃料電池首選</div>
+                        </div>
+                    </div>
+                </button>
+                <button onclick="filterResource('oil')" class="resource-card oil-gradient rounded-xl p-4 text-left opacity-60">
+                    <div class="flex items-center gap-3">
+                        <div class="text-3xl">🛢️</div>
+                        <div>
+                            <div class="text-lg font-semibold">石油</div>
+                            <div class="text-sm text-red-200">傳統備援發電</div>
+                            <div class="text-xs text-red-300/70 mt-1">角色有限，僅作緊急備援</div>
+                        </div>
+                    </div>
+                </button>
+            </div>
+            <div class="bg-slate-800/50 rounded-lg p-4 text-sm text-slate-300">
+                <div class="flex items-start gap-2">
+                    <span class="text-blue-400">💡</span>
+                    <div>
+                        <span class="font-semibold text-blue-300">為什麼是天然氣？</span>
+                        <p class="mt-1 text-slate-400">
+                            AI資料中心需要 24/7 穩定電力。天然氣通過 
+                            <a href="https://www.bloomenergy.com/wp-content/uploads/2026-power-report.pdf" target="_blank" class="text-blue-400 hover:underline">Bloom Energy 固態氧化物燃料電池 (SOFC)</a>
+                            可實現高效、低排放的現場發電，成為 AI 算力擴張的關鍵能源。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid lg:grid-cols-3 gap-6">
+            <!-- Map Section -->
+            <div class="lg:col-span-2">
+                <div class="glass-panel rounded-2xl p-4 md:p-6">
+                    <h2 class="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
+                        <span>🗺️</span> AI資源供應鏈分布
+                    </h2>
+                    <div id="map-container" class="relative rounded-xl overflow-hidden bg-slate-900" style="height: 400px;">
+                        <svg id="world-map" width="100%" height="100%"></svg>
+                        <div id="tooltip" class="tooltip hidden"></div>
+                    </div>
+                    <div class="mt-4 flex flex-wrap gap-2 md:gap-4 text-xs md:text-sm text-slate-400">
+                        <div class="flex items-center gap-1 md:gap-2">
+                            <span class="w-3 h-3 rounded-full bg-blue-600"></span> 天然氣主要出口國
+                        </div>
+                        <div class="flex items-center gap-1 md:gap-2">
+                            <span class="w-3 h-3 rounded-full bg-purple-600"></span> 關鍵礦產
+                        </div>
+                        <div class="flex items-center gap-1 md:gap-2">
+                            <span class="w-3 h-3 rounded-full bg-cyan-500"></span> AI資料中心熱點
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Data Center Power Sources Chart -->
+                <div class="glass-panel rounded-2xl p-4 md:p-6 mt-4 md:mt-6">
+                    <h2 class="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
+                        <span>📊</span> AI資料中心電力來源占比
+                        <span class="text-xs text-slate-400 font-normal">(IEA Energy and AI 2025)</span>
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <canvas id="power-source-chart"></canvas>
+                        </div>
+                        <div class="flex flex-col justify-center space-y-3 text-sm">
+                            <div class="bg-slate-800/50 rounded-lg p-3">
+                                <div class="flex items-center gap-2 text-emerald-400">
+                                    <span class="text-lg">🌱</span>
+                                    <span class="font-semibold">再生能源 35%</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">大型科技公司承諾 100% 再生能源</p>
+                            </div>
+                            <div class="bg-slate-800/50 rounded-lg p-3">
+                                <div class="flex items-center gap-2 text-blue-400">
+                                    <span class="text-lg">🔥</span>
+                                    <span class="font-semibold">天然氣 32%</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">Bloom SOFC 現場發電主要燃料</p>
+                            </div>
+                            <div class="bg-slate-800/50 rounded-lg p-3">
+                                <div class="flex items-center gap-2 text-yellow-400">
+                                    <span class="text-lg">⚡</span>
+                                    <span class="font-semibold">電網電力 28%</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">混合來源，依地區而異</p>
+                            </div>
+                            <div class="bg-slate-800/50 rounded-lg p-3 opacity-60">
+                                <div class="flex items-center gap-2 text-red-400">
+                                    <span class="text-lg">🛢️</span>
+                                    <span class="font-semibold">石油/其他 5%</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">備援角色，占比有限</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Country Details -->
+            <div class="lg:col-span-1">
+                <div class="glass-panel rounded-2xl p-6">
+                    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <span>📋</span> 國家能源詳情
+                    </h2>
+                    <div id="country-details" class="space-y-4">
+                        <div class="text-slate-400 text-center py-8">
+                            <span class="text-4xl mb-2 block">👆</span>
+                            點擊地圖上的國家查看<br>天然氣與AI能源詳情
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Natural Gas Rankings -->
+                <div class="glass-panel rounded-2xl p-6 mt-6">
+                    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <span>🏆</span> 天然氣儲量排行
+                    </h2>
+                    <div class="space-y-2" id="gas-ranking">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+
+                <!-- Risk Alert -->
+                <div class="glass-panel rounded-2xl p-6 mt-6 border border-red-500/30 bg-red-900/10">
+                    <h2 class="text-lg font-semibold mb-3 flex items-center gap-2 text-red-400">
+                        <span>⚠️</span> 供應風險提示
+                    </h2>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-start gap-2">
+                            <span class="text-yellow-400">🔸</span>
+                            <div>
+                                <div class="font-medium text-slate-300">地緣政治風險</div>
+                                <p class="text-xs text-slate-400">俄羅斯天然氣出口受制裁影響，歐洲轉向美國LNG</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="text-green-400">🔹</span>
+                            <div>
+                                <div class="font-medium text-slate-300">美國供應穩定</div>
+                                <p class="text-xs text-slate-400">頁岩氣革命使美國成為全球最大天然氣生產國</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="text-blue-400">🔹</span>
+                            <div>
+                                <div class="font-medium text-slate-300">中國無主導</div>
+                                <p class="text-xs text-slate-400">中國天然氣儲量有限，高度依賴進口（澳洲、卡達）</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // AI Resource Data
+        const aiResourceData = {
+            // Natural Gas Exporters for AI Power
+            'Russia': {
+                name: '俄羅斯',
+                resources: ['gas'],
+                gasReserves: '47.7',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '24.2%',
+                gasProduction: '16.5',
+                gasProductionUnit: '兆立方英尺/年',
+                aiRelevance: '歐洲AI資料中心主要供應國（戰前），現受制裁影響',
+                exportMarkets: ['中國(35%)', '歐洲(25%)', '土耳其(12%)'],
+                riskLevel: '高',
+                riskReason: '地緣政治制裁、出口管制',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024 / EIA',
+                description: '全球最大天然氣儲量國，但受國際制裁影響出口',
+                color: '#3b82f6'
+            },
+            'Iran': {
+                name: '伊朗',
+                resources: ['gas'],
+                gasReserves: '34.0',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '17.3%',
+                gasProduction: '8.2',
+                gasProductionUnit: '兆立方英尺/年',
+                aiRelevance: '儲量豐富但開發受限，潛在供應國',
+                exportMarkets: ['土耳其', '伊拉克', '中國'],
+                riskLevel: '高',
+                riskReason: '國際制裁、技術封鎖',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
+                description: '全球第二大天然氣儲量國，但出口受限',
+                color: '#3b82f6'
+            },
+            'Qatar': {
+                name: '卡達',
+                resources: ['gas'],
+                gasReserves: '24.9',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '12.6%',
+                gasProduction: '5.8',
+                gasProductionUnit: '兆立方英尺/年',
+                aiRelevance: '全球最大LNG出口國，亞洲AI資料中心主要供應商',
+                exportMarkets: ['中國(20%)', '日本(18%)', '印度(12%)', '韓國(10%)', '台灣(8%)'],
+                riskLevel: '低',
+                riskReason: '政治穩定、供應可靠',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
+                description: '全球最大LNG出口國，亞洲AI算力關鍵能源供應商',
+                color: '#3b82f6'
+            },
+            'United States': {
+                name: '美國',
+                resources: ['gas'],
+                gasReserves: '17.5',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '8.9%',
+                gasProduction: '28.5',
+                gasProductionUnit: '兆立方英尺/年',
+                aiRelevance: '全球最大天然氣生產國，AI資料中心需求成長+15%',
+                exportMarkets: ['歐洲(42%)', '亞洲(35%)', '美洲(23%)'],
+                riskLevel: '低',
+                riskReason: '頁岩氣革命、供應穩定、技術領先',
+                dataYear: '2024',
+                dataSource: 'EIA Short-Term Energy Outlook 2026',
+                description: '全球最大天然氣生產國，AI資料中心帶動需求快速成長',
+                color: '#3b82f6'
+            },
+            'Turkmenistan': {
+                name: '土庫曼',
+                resources: ['gas'],
+                gasReserves: '13.9',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '7.1%',
+                gasProduction: '3.2',
+                gasProductionUnit: '兆立方英尺/年',
+                aiRelevance: '中國「一帶一路」天然氣主要供應國',
+                exportMarkets: ['中國(85%)', '俄羅斯(10%)'],
+                riskLevel: '中',
+                riskReason: '地緣政治集中度高、管道依賴',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
+                description: '中亞最大天然氣出口國，主要供應中國',
+                color: '#3b82f6'
+            },
+            'Saudi Arabia': {
+                name: '沙烏地阿拉伯',
+                resources: ['gas'],
+                gasReserves: '9.2',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '4.7%',
+                gasProduction: '4.1',
+                gasProductionUnit: '兆立方英尺/年',
+                aiRelevance: '中東AI資料中心潛在供應商，Vision 2030投資AI',
+                exportMarkets: ['日本', '韓國', '中國'],
+                riskLevel: '中',
+                riskReason: '地緣政治、產業轉型中',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
+                description: '中東主要天然氣生產國，積極投資AI產業',
+                color: '#3b82f6'
+            },
+            'United Arab Emirates': {
+                name: '阿聯',
+                resources: ['gas'],
+                gasReserves: '8.2',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '4.2%',
+                gasProduction: '2.8',
+                gasProductionUnit: '兆立方英尺/年',
+                aiRelevance: '中東AI樞紐，G42等AI公司快速成長',
+                exportMarkets: ['日本', '韓國', '印度', '中國'],
+                riskLevel: '低',
+                riskReason: '政治穩定、投資AI積極',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
+                description: '中東AI產業中心，天然氣供應穩定',
+                color: '#3b82f6'
+            },
+            'Australia': {
+                name: '澳洲',
+                resources: ['gas', 'lithium', 'copper'],
+                gasReserves: '3.2',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '1.6%',
+                gasProduction: '1.8',
+                gasProductionUnit: '兆立方英尺/年',
+                lithiumReserves: '620',
+                lithiumReservesUnit: '萬噸',
+                lithiumReservesGlobal: '21%',
+                copperReserves: '1.0',
+                copperReservesUnit: '億噸',
+                aiRelevance: '亞洲AI供應鏈關鍵：LNG + 鋰礦 + 銅礦',
+                exportMarkets: ['中國(42%)', '日本(25%)', '韓國(18%)', '台灣(8%)'],
+                riskLevel: '低',
+                riskReason: '政治穩定、供應可靠、品質高',
+                dataYear: '2024/2025',
+                dataSource: 'BP 2024 / USGS 2025',
+                description: '亞洲AI供應鏈核心：天然氣 + 鋰礦 + 銅礦',
+                color: '#14b8a6'
+            }
+        };
+
+        // Initialize Map
+        function initMap() {
+            const width = document.getElementById('map-container').clientWidth;
+            const height = 400;
+            
+            const svg = d3.select('#world-map')
+                .attr('viewBox', `0 0 ${width} ${height}`);
+            
+            const projection = d3.geoNaturalEarth1()
+                .scale(width / 5.5)
+                .translate([width / 2, height / 2]);
+            
+            const path = d3.geoPath().projection(projection);
+            
+            d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+                .then(world => {
+                    const countries = topojson.feature(world, world.objects.countries);
+                    
+                    svg.selectAll('path')
+                        .data(countries.features)
+                        .enter()
+                        .append('path')
+                        .attr('class', 'country-path')
+                        .attr('d', path)
+                        .attr('fill', d => getCountryColor(d.properties.name))
+                        .attr('stroke', '#1e293b')
+                        .attr('stroke-width', 0.5)
+                        .on('click', (event, d) => showCountryDetails(d.properties.name))
+                        .on('mouseover', function(event, d) {
+                            d3.select(this).attr('opacity', 0.8);
+                            showTooltip(event, d.properties.name);
+                        })
+                        .on('mouseout', function() {
+                            d3.select(this).attr('opacity', 1);
+                            hideTooltip();
+                        });
+                    
+                    addResourceMarkers(svg, projection);
+                })
+                .catch(error => {
+                    console.error('Error loading map data:', error);
+                });
+        }
+
+        function getCountryColor(countryName) {
+            const data = aiResourceData[countryName];
+            if (!data) return '#334155';
+            return data.color || '#334155';
+        }
+
+        function addResourceMarkers(svg, projection) {
+            const markers = [
+                { name: 'Russia', coords: [95, 60], type: 'gas' },
+                { name: 'Qatar', coords: [51, 25], type: 'gas' },
+                { name: 'United States', coords: [-100, 40], type: 'gas' },
+                { name: 'Australia', coords: [135, -25], type: 'multi' },
+                { name: 'United Arab Emirates', coords: [54, 24], type: 'gas' }
+            ];
+            
+            markers.forEach(marker => {
+                const [x, y] = projection(marker.coords);
+                if (x && y) {
+                    svg.append('circle')
+                        .attr('cx', x)
+                        .attr('cy', y)
+                        .attr('r', 6)
+                        .attr('fill', marker.type === 'multi' ? '#14b8a6' : '#3b82f6')
+                        .attr('stroke', '#fff')
+                        .attr('stroke-width', 2)
+                        .attr('class', 'pulse-ring')
+                        .style('cursor', 'pointer')
+                        .on('click', () => showCountryDetails(marker.name));
+                }
+            });
+        }
+
+        function showCountryDetails(countryName) {
+            const data = aiResourceData[countryName];
+            const container = document.getElementById('country-details');
+            
+            if (!data) {
+                container.innerHTML = `
+                    <div class="text-slate-400 text-center py-8">
+                        <span class="text-4xl mb-2 block">📍</span>
+                        ${countryName}<br>暫無AI能源詳細資料
+                    </div>
+                `;
+                return;
+            }
+            
+            const riskBadge = data.riskLevel === '高' 
+                ? '<span class="px-2 py-1 bg-red-600/20 text-red-400 rounded text-xs border border-red-600/50">高風險</span>'
+                : data.riskLevel === '中'
+                ? '<span class="px-2 py-1 bg-yellow-600/20 text-yellow-400 rounded text-xs border border-yellow-600/50">中風險</span>'
+                : '<span class="px-2 py-1 bg-green-600/20 text-green-400 rounded text-xs border border-green-600/50">低風險</span>';
+            
+            container.innerHTML = `
+                <div class="border-b border-slate-700 pb-4 mb-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-bold text-white">${data.name}</h3>
+                        ${riskBadge}
+                    </div>
+                    <p class="text-slate-400 text-sm mt-1">${data.description}</p>
+                </div>
+
+                <div class="space-y-4">
+                    ${data.gasReserves ? `
+                        <div class="bg-blue-900/20 border border-blue-600/30 rounded-lg p-4">
+                            <div class="text-xs text-blue-400 mb-2">🔥 天然氣儲量</div>
+                            <div class="text-2xl font-bold text-blue-400">${data.gasReserves} <span class="text-sm">${data.gasReservesUnit}</span></div>
+                            <div class="text-sm text-blue-300/70">全球占比: ${data.gasReservesGlobal}</div>
+                        </div>
+                    ` : ''}
+
+                    ${data.gasProduction ? `
+                        <div>
+                            <h4 class="text-sm font-semibold text-slate-300 mb-2">⚡ 年產量</h4>
+                            <div class="text-lg font-mono text-white">${data.gasProduction} ${data.gasProductionUnit}</div>
+                        </div>
+                    ` : ''}
+
+                    ${data.aiRelevance ? `
+                        <div class="bg-slate-800/50 rounded-lg p-3">
+                            <div class="text-xs text-slate-400 mb-1">🤖 AI相關性</div>
+                            <div class="text-sm text-slate-300">${data.aiRelevance}</div>
+                        </div>
+                    ` : ''}
+
+                    ${data.exportMarkets ? `
+                        <div>
+                            <h4 class="text-sm font-semibold text-slate-300 mb-2">🚢 主要出口市場</h4>
+                            <div class="flex flex-wrap gap-2">
+                                ${data.exportMarkets.map(m => `
+                                    <span class="px-2 py-1 bg-slate-700 rounded text-xs text-slate-300">${m}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${data.riskReason ? `
+                        <div class="bg-red-900/10 border border-red-600/20 rounded-lg p-3">
+                            <div class="text-xs text-red-400 mb-1">⚠️ 風險因素</div>
+                            <div class="text-sm text-slate-300">${data.riskReason}</div>
+                        </div>
+                    ` : ''}
+
+                    <div class="mt-4 pt-3 border-t border-slate-700/50">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-500">📅 資料年份</span>
+                            <span class="text-slate-400">${data.dataYear}</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs mt-1">
+                            <span class="text-slate-500">📚 資料來源</span>
+                            <span class="text-slate-400">${data.dataSource}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showTooltip(event, countryName) {
+            const tooltip = document.getElementById('tooltip');
+            const data = aiResourceData[countryName];
+            
+            if (data) {
+                tooltip.innerHTML = `
+                    <strong>${data.name}</strong><br>
+                    <span class="text-sm text-slate-300">${data.description}</span>
+                `;
+                tooltip.classList.remove('hidden');
+                tooltip.style.left = event.pageX + 10 + 'px';
+                tooltip.style.top = event.pageY + 10 + 'px';
+            }
+        }
+
+        function hideTooltip() {
+            document.getElementById('tooltip').classList.add('hidden');
+        }
+
+        function filterResource(type) {
+            d3.selectAll('.country-path')
+                .attr('opacity', d => {
+                    const data = aiResourceData[d.properties.name];
+                    if (!data) return 0.2;
+                    return data.resources.includes(type) ? 1 : 0.2;
+                });
+        }
+
+        function showAllResources() {
+            d3.selectAll('.country-path').attr('opacity', 1);
+        }
+
+        // Initialize Power Source Chart
+        function initPowerChart() {
+            const ctx = document.getElementById('power-source-chart');
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['再生能源', '天然氣', '電網電力', '石油/其他'],
+                    datasets: [{
+                        data: [35, 32, 28, 5],
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { 
+                                color: '#94a3b8', 
+                                font: { size: 11 },
+                                padding: 15
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize Gas Rankings
+        function initGasRankings() {
+            const rankings = [
+                { rank: 1, country: 'Russia', name: '俄羅斯', reserves: '47.7', global: '24.2%', risk: '高' },
+                { rank: 2, country: 'Iran', name: '伊朗', reserves: '34.0', global: '17.3%', risk: '高' },
+                { rank: 3, country: 'Qatar', name: '卡達', reserves: '24.9', global: '12.6%', risk: '低' },
+                { rank: 4, country: 'United States', name: '美國', reserves: '17.5', global: '8.9%', risk: '低' },
+                { rank: 5, country: 'Turkmenistan', name: '土庫曼', reserves: '13.9', global: '7.1%', risk: '中' }
+            ];
+
+            const container = document.getElementById('gas-ranking');
+            container.innerHTML = rankings.map(item => `
+                <div onclick="showCountryDetails('${item.country}')" 
+                    class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700 cursor-pointer transition-colors">
+                    <div class="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold ${item.rank <= 3 ? 'text-yellow-400' : 'text-slate-400'}">
+                        ${item.rank}
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-sm font-medium text-white">${item.name}</div>
+                        <div class="text-xs text-slate-400">${item.reserves} Tcf (${item.global})</div>
+                    </div>
+                    <span class="text-xs px-2 py-0.5 rounded ${item.risk === '高' ? 'bg-red-600/20 text-red-400' : item.risk === '中' ? 'bg-yellow-600/20 text-yellow-400' : 'bg-green-600/20 text-green-400'}">
+                        ${item.risk}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            initPowerChart();
+            initGasRankings();
+        });
+    </script>
+</body>
+</html>
