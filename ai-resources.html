@@ -251,7 +251,10 @@
                             <span class="w-3 h-3 rounded-full bg-purple-600"></span> 關鍵礦產
                         </div>
                         <div class="flex items-center gap-1 md:gap-2">
-                            <span class="w-3 h-3 rounded-full bg-cyan-500"></span> AI資料中心熱點
+                            <span class="w-3 h-3 rounded-full bg-cyan-500"></span> AI資料中心
+                        </div>
+                        <div class="flex items-center gap-1 md:gap-2">
+                            <span class="w-3 h-3 rounded-full bg-cyan-500 animate-pulse"></span> Microsoft/Google/AWS/Meta
                         </div>
                     </div>
                 </div>
@@ -321,6 +324,31 @@
                     </h2>
                     <div class="space-y-2" id="gas-ranking">
                         <!-- Dynamic content -->
+                    </div>
+                </div>
+
+                <!-- Natural Gas Price Trend Chart -->
+                <div class="glass-panel rounded-2xl p-6 mt-6">
+                    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <span>📈</span> 天然氣價格趨勢
+                        <span class="text-xs text-slate-400 font-normal">(EIA / Bloomberg 2026)</span>
+                    </h2>
+                    <div class="h-64">
+                        <canvas id="price-trend-chart"></canvas>
+                    </div>
+                    <div class="mt-4 grid grid-cols-3 gap-2 text-xs">
+                        <div class="bg-blue-900/20 rounded p-2 text-center">
+                            <div class="text-blue-400 font-semibold">美國 Henry Hub</div>
+                            <div class="text-slate-400">頁岩氣革命後價格穩定</div>
+                        </div>
+                        <div class="bg-amber-900/20 rounded p-2 text-center">
+                            <div class="text-amber-400 font-semibold">歐洲 TTF</div>
+                            <div class="text-slate-400">2022年烏克兰危機飆升</div>
+                        </div>
+                        <div class="bg-emerald-900/20 rounded p-2 text-center">
+                            <div class="text-emerald-400 font-semibold">亞洲 JKM</div>
+                            <div class="text-slate-400">AI需求推動價格上漲</div>
+                        </div>
                     </div>
                 </div>
 
@@ -501,6 +529,108 @@
                 dataSource: 'BP 2024 / USGS 2025',
                 description: '亞洲AI供應鏈核心：天然氣 + 鋰礦 + 銅礦',
                 color: '#14b8a6'
+            },
+            'Norway': {
+                name: '挪威',
+                resources: ['gas'],
+                gasReserves: '2.1',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '1.1%',
+                gasProduction: '4.2',
+                gasProductionUnit: '兆立方英尺/年',
+                aiRelevance: '歐洲AI資料中心主要供應商，替代俄羅斯供應',
+                exportMarkets: ['德國(35%)', '英國(25%)', '法國(15%)', '荷蘭(12%)', '比利時(8%)'],
+                riskLevel: '低',
+                riskReason: '政治穩定、環保形象、供應可靠',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
+                description: '歐洲最大天然氣出口國（替代俄羅斯），北海油氣大國',
+                color: '#3b82f6'
+            },
+            'Algeria': {
+                name: '阿爾及利亞',
+                resources: ['gas'],
+                gasReserves: '7.1',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '3.6%',
+                gasProduction: '3.1',
+                gasProductionUnit: '兆立方英尺/年',
+                aiRelevance: '非洲最大天然氣出口國，歐洲南部供應商',
+                exportMarkets: ['義大利(32%)', '西班牙(25%)', '法國(18%)', '土耳其(12%)'],
+                riskLevel: '中',
+                riskReason: '地緣政治不穩定、管道安全風險',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
+                description: '非洲最大天然氣出口國，透過管道供應南歐',
+                color: '#3b82f6'
+            },
+            'Nigeria': {
+                name: '奈及利亞',
+                resources: ['gas'],
+                gasReserves: '5.3',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '2.7%',
+                gasProduction: '1.8',
+                gasProductionUnit: '兆立方英尺/年',
+                aiRelevance: '非洲LNG出口國，潛在供應增長',
+                exportMarkets: ['西班牙(22%)', '義大利(18%)', '法國(12%)', '印度(10%)', '土耳其(8%)'],
+                riskLevel: '高',
+                riskReason: '國內安全問題、基礎設施不足',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
+                description: '非洲最大經濟體，天然氣儲量豐富但開發受限',
+                color: '#3b82f6'
+            },
+            'Malaysia': {
+                name: '馬來西亞',
+                resources: ['gas'],
+                gasReserves: '2.6',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '1.3%',
+                gasProduction: '2.8',
+                gasProductionUnit: '兆立方英尺/年',
+                aiRelevance: '東南亞AI資料中心供應商，Google/微軟資料中心所在地',
+                exportMarkets: ['日本(35%)', '中國(22%)', '韓國(15%)', '台灣(12%)'],
+                riskLevel: '低',
+                riskReason: '政治穩定、投資環境良好',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
+                description: '東南亞LNG出口國，AI資料中心快速發展',
+                color: '#3b82f6'
+            },
+            'Indonesia': {
+                name: '印尼',
+                resources: ['gas'],
+                gasReserves: '4.3',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '2.2%',
+                gasProduction: '2.4',
+                gasProductionUnit: '兆立方英尺/年',
+                aiRelevance: '東南亞最大經濟體，AI資料中心潛在市場',
+                exportMarkets: ['中國(28%)', '日本(25%)', '韓國(18%)', '台灣(12%)'],
+                riskLevel: '中',
+                riskReason: '國內需求增長、出口政策變化',
+                dataYear: '2024',
+                dataSource: 'BP Statistical Review 2024',
+                description: '東南亞最大天然氣生產國，國內AI需求快速成長',
+                color: '#3b82f6'
+            },
+            'Canada': {
+                name: '加拿大',
+                resources: ['gas'],
+                gasReserves: '2.8',
+                gasReservesUnit: '兆立方英尺',
+                gasReservesGlobal: '1.4%',
+                gasProduction: '6.2',
+                gasProductionUnit: '兆立方英尺/年',
+                aiRelevance: '北美AI資料中心供應商，水力發電+天然氣混合',
+                exportMarkets: ['美國(98%)'],
+                riskLevel: '低',
+                riskReason: '政治穩定、環保法規嚴格、供應可靠',
+                dataYear: '2024',
+                dataSource: 'EIA 2026',
+                description: '北美天然氣生產大國，AI資料中心綠色能源首選',
+                color: '#3b82f6'
             }
         };
 
@@ -555,12 +685,17 @@
         }
 
         function addResourceMarkers(svg, projection) {
+            // Natural gas exporters
             const markers = [
                 { name: 'Russia', coords: [95, 60], type: 'gas' },
                 { name: 'Qatar', coords: [51, 25], type: 'gas' },
                 { name: 'United States', coords: [-100, 40], type: 'gas' },
                 { name: 'Australia', coords: [135, -25], type: 'multi' },
-                { name: 'United Arab Emirates', coords: [54, 24], type: 'gas' }
+                { name: 'United Arab Emirates', coords: [54, 24], type: 'gas' },
+                { name: 'Norway', coords: [10, 62], type: 'gas' },
+                { name: 'Algeria', coords: [2, 28], type: 'gas' },
+                { name: 'Canada', coords: [-106, 56], type: 'gas' },
+                { name: 'Malaysia', coords: [102, 4], type: 'gas' }
             ];
             
             markers.forEach(marker => {
@@ -576,6 +711,56 @@
                         .attr('class', 'pulse-ring')
                         .style('cursor', 'pointer')
                         .on('click', () => showCountryDetails(marker.name));
+                }
+            });
+
+            // AI Data Centers
+            const aiDataCenters = [
+                { name: 'Microsoft', location: 'Virginia', coords: [-78, 38], country: 'United States' },
+                { name: 'Google', location: 'Iowa', coords: [-93, 42], country: 'United States' },
+                { name: 'Amazon AWS', location: 'Oregon', coords: [-120, 44], country: 'United States' },
+                { name: 'Meta', location: 'Texas', coords: [-97, 31], country: 'United States' },
+                { name: 'Microsoft', location: 'Singapore', coords: [104, 1], country: 'Singapore' },
+                { name: 'Google', location: 'Tokyo', coords: [140, 36], country: 'Japan' },
+                { name: 'Amazon AWS', location: 'Frankfurt', coords: [9, 50], country: 'Germany' },
+                { name: 'Microsoft', location: 'Dublin', coords: [-6, 53], country: 'Ireland' },
+                { name: 'Google', location: 'Sydney', coords: [151, -34], country: 'Australia' }
+            ];
+
+            aiDataCenters.forEach(dc => {
+                const [x, y] = projection(dc.coords);
+                if (x && y) {
+                    // Outer glow
+                    svg.append('circle')
+                        .attr('cx', x)
+                        .attr('cy', y)
+                        .attr('r', 12)
+                        .attr('fill', 'rgba(6, 182, 212, 0.2)')
+                        .attr('class', 'pulse-ring');
+                    
+                    // Inner dot
+                    svg.append('circle')
+                        .attr('cx', x)
+                        .attr('cy', y)
+                        .attr('r', 4)
+                        .attr('fill', '#06b6d4')
+                        .attr('stroke', '#fff')
+                        .attr('stroke-width', 1)
+                        .style('cursor', 'pointer')
+                        .on('mouseover', (event) => {
+                            const tooltip = document.getElementById('tooltip');
+                            tooltip.innerHTML = `
+                                <strong>${dc.name}</strong><br>
+                                <span class="text-sm text-slate-300">${dc.location}</span><br>
+                                <span class="text-xs text-cyan-400">🤖 AI資料中心</span>
+                            `;
+                            tooltip.classList.remove('hidden');
+                            tooltip.style.left = event.pageX + 10 + 'px';
+                            tooltip.style.top = event.pageY + 10 + 'px';
+                        })
+                        .on('mouseout', () => {
+                            document.getElementById('tooltip').classList.add('hidden');
+                        });
                 }
             });
         }
@@ -734,7 +919,12 @@
                 { rank: 2, country: 'Iran', name: '伊朗', reserves: '34.0', global: '17.3%', risk: '高' },
                 { rank: 3, country: 'Qatar', name: '卡達', reserves: '24.9', global: '12.6%', risk: '低' },
                 { rank: 4, country: 'United States', name: '美國', reserves: '17.5', global: '8.9%', risk: '低' },
-                { rank: 5, country: 'Turkmenistan', name: '土庫曼', reserves: '13.9', global: '7.1%', risk: '中' }
+                { rank: 5, country: 'Turkmenistan', name: '土庫曼', reserves: '13.9', global: '7.1%', risk: '中' },
+                { rank: 6, country: 'Saudi Arabia', name: '沙烏地阿拉伯', reserves: '9.2', global: '4.7%', risk: '中' },
+                { rank: 7, country: 'United Arab Emirates', name: '阿聯', reserves: '8.2', global: '4.2%', risk: '低' },
+                { rank: 8, country: 'Algeria', name: '阿爾及利亞', reserves: '7.1', global: '3.6%', risk: '中' },
+                { rank: 9, country: 'Nigeria', name: '奈及利亞', reserves: '5.3', global: '2.7%', risk: '高' },
+                { rank: 10, country: 'Indonesia', name: '印尼', reserves: '4.3', global: '2.2%', risk: '中' }
             ];
 
             const container = document.getElementById('gas-ranking');
@@ -755,11 +945,91 @@
             `).join('');
         }
 
+        // Initialize Gas Price Trend Chart
+        function initPriceChart() {
+            const ctx = document.getElementById('price-trend-chart');
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024', '2025E', '2026E'],
+                    datasets: [
+                        {
+                            label: '美國 Henry Hub ($/MMBtu)',
+                            data: [2.03, 3.89, 6.45, 2.57, 2.21, 3.15, 3.85],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: '歐洲 TTF ($/MMBtu)',
+                            data: [3.25, 8.42, 37.82, 13.24, 10.85, 12.50, 11.20],
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: '亞洲 JKM ($/MMBtu)',
+                            data: [4.12, 9.85, 34.65, 12.85, 11.20, 13.50, 12.80],
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { 
+                                color: '#94a3b8', 
+                                font: { size: 10 },
+                                padding: 10
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '全球天然氣價格趨勢 (2020-2026E)',
+                            color: '#e2e8f0',
+                            font: { size: 14 }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { 
+                                color: '#94a3b8',
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            },
+                            grid: { color: '#334155' },
+                            title: {
+                                display: true,
+                                text: '美元/百萬英熱單位',
+                                color: '#64748b',
+                                font: { size: 10 }
+                            }
+                        },
+                        x: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
             initPowerChart();
             initGasRankings();
+            initPriceChart();
         });
     </script>
 </body>
