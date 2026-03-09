@@ -79,7 +79,14 @@
                         <p class="text-sm text-slate-400">World Natural Resources Map 2025</p>
                     </div>
                 </div>
-                <div class="flex gap-2">
+                <div class="flex items-center gap-3">
+                    <!-- Search Box -->
+                    <div class="relative">
+                        <input type="text" id="country-search" placeholder="🔍 搜尋國家..." 
+                            class="px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 w-48 transition-all"
+                            onkeyup="searchCountries(this.value)">
+                        <div id="search-results" class="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-600 rounded-lg shadow-xl hidden z-50 max-h-60 overflow-y-auto"></div>
+                    </div>
                     <button onclick="showAllResources()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition">
                         顯示全部
                     </button>
@@ -232,13 +239,28 @@
                     </div>
                 </div>
 
-                <!-- Top Exporters -->
+                <!-- Resource Rankings -->
                 <div class="glass-panel rounded-2xl p-6 mt-6">
                     <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                        <span>🚢</span> 主要出口國
+                        <span>🏆</span> 資源儲量排行
                     </h2>
-                    <div id="top-exporters" class="space-y-3">
-                        <!-- Dynamic content -->
+                    <div class="space-y-2 mb-4">
+                        <select id="ranking-select" onchange="updateRanking(this.value)" 
+                            class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-white focus:outline-none focus:border-blue-500">
+                            <option value="oil">🛢️ 石油儲量 Top 10</option>
+                            <option value="gas">🔥 天然氣儲量 Top 10</option>
+                            <option value="coal">⬛ 煤炭儲量 Top 10</option>
+                            <option value="gold">👑 黃金儲量 Top 10</option>
+                            <option value="copper">🟠 銅礦儲量 Top 10</option>
+                            <option value="lithium">🔋 鋰礦儲量 Top 10</option>
+                            <option value="nickel">⚙️ 鎳礦儲量 Top 10</option>
+                            <option value="diamond">💎 鑽石儲量 Top 10</option>
+                            <option value="uranium">☢️ 鈾礦儲量 Top 10</option>
+                            <option value="bauxite">🟤 鋁土礦儲量 Top 10</option>
+                        </select>
+                    </div>
+                    <div id="ranking-list" class="space-y-2">
+                        <!-- Dynamic ranking content -->
                     </div>
                 </div>
             </div>
@@ -2139,13 +2161,220 @@
                     點擊地圖上的國家查看詳情
                 </div>
             `;
+            // Clear search
+            document.getElementById('country-search').value = '';
+            document.getElementById('search-results').classList.add('hidden');
         }
+
+        // Search functionality
+        function searchCountries(query) {
+            const resultsContainer = document.getElementById('search-results');
+            
+            if (!query || query.length < 1) {
+                resultsContainer.classList.add('hidden');
+                return;
+            }
+            
+            const matches = Object.entries(resourceData)
+                .filter(([key, data]) => {
+                    const searchText = (data.name + ' ' + key).toLowerCase();
+                    return searchText.includes(query.toLowerCase());
+                })
+                .slice(0, 8);
+            
+            if (matches.length === 0) {
+                resultsContainer.innerHTML = '<div class="px-4 py-2 text-sm text-slate-400">找不到符合的國家</div>';
+            } else {
+                resultsContainer.innerHTML = matches.map(([key, data]) => `
+                    <div onclick="selectCountry('${key}')" 
+                        class="px-4 py-2 hover:bg-slate-700 cursor-pointer flex items-center gap-2 transition-colors border-b border-slate-700/50 last:border-0">
+                        <span style="color: ${data.color || '#94a3b8'}">●</span>
+                        <div>
+                            <div class="text-sm text-white font-medium">${data.name}</div>
+                            <div class="text-xs text-slate-400">${data.description.substring(0, 30)}...</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            resultsContainer.classList.remove('hidden');
+        }
+        
+        function selectCountry(countryKey) {
+            showCountryDetails(countryKey);
+            document.getElementById('country-search').value = resourceData[countryKey]?.name || '';
+            document.getElementById('search-results').classList.add('hidden');
+            
+            // Highlight on map
+            d3.selectAll('.country-path')
+                .attr('opacity', d => d.properties.name === countryKey ? 1 : 0.3)
+                .attr('stroke-width', d => d.properties.name === countryKey ? 2 : 0.5);
+        }
+
+        // Ranking functionality
+        const rankingsData = {
+            oil: [
+                { name: '委內瑞拉', value: '303.2', unit: '十億桶', global: '19.3%', country: 'Venezuela' },
+                { name: '沙烏地阿拉伯', value: '267.2', unit: '十億桶', global: '17.0%', country: 'Saudi Arabia' },
+                { name: '伊朗', value: '208.6', unit: '十億桶', global: '13.3%', country: 'Iran' },
+                { name: '伊拉克', value: '145.0', unit: '十億桶', global: '9.2%', country: 'Iraq' },
+                { name: '科威特', value: '101.5', unit: '十億桶', global: '6.5%', country: 'Kuwait' },
+                { name: '阿聯', value: '113.0', unit: '十億桶', global: '7.2%', country: 'UAE' },
+                { name: '俄羅斯', value: '80.0', unit: '十億桶', global: '5.1%', country: 'Russia' },
+                { name: '美國', value: '45.0', unit: '十億桶', global: '2.9%', country: 'United States' },
+                { name: '利比亞', value: '48.4', unit: '十億桶', global: '3.1%', country: 'Libya' },
+                { name: '奈及利亞', value: '37.3', unit: '十億桶', global: '2.4%', country: 'Nigeria' }
+            ],
+            gas: [
+                { name: '俄羅斯', value: '47.7', unit: '兆立方英尺', global: '24.2%', country: 'Russia' },
+                { name: '伊朗', value: '34.0', unit: '兆立方英尺', global: '17.3%', country: 'Iran' },
+                { name: '卡達', value: '24.9', unit: '兆立方英尺', global: '12.6%', country: 'Qatar' },
+                { name: '美國', value: '17.5', unit: '兆立方英尺', global: '8.9%', country: 'United States' },
+                { name: '土庫曼', value: '13.9', unit: '兆立方英尺', global: '7.1%', country: 'Turkmenistan' },
+                { name: '阿聯', value: '8.2', unit: '兆立方英尺', global: '4.2%', country: 'UAE' },
+                { name: '沙烏地阿拉伯', value: '9.2', unit: '兆立方英尺', global: '4.7%', country: 'Saudi Arabia' },
+                { name: '委內瑞拉', value: '6.3', unit: '兆立方英尺', global: '3.2%', country: 'Venezuela' },
+                { name: '阿爾及利亞', value: '7.1', unit: '兆立方英尺', global: '3.6%', country: 'Algeria' },
+                { name: '埃及', value: '2.1', unit: '兆立方英尺', global: '1.1%', country: 'Egypt' }
+            ],
+            coal: [
+                { name: '美國', value: '2,200', unit: '億噸', global: '22.1%', country: 'United States' },
+                { name: '俄羅斯', value: '1,600', unit: '億噸', global: '15.5%', country: 'Russia' },
+                { name: '澳洲', value: '1,500', unit: '億噸', global: '14.0%', country: 'Australia' },
+                { name: '中國', value: '1,400', unit: '億噸', global: '13.3%', country: 'China' },
+                { name: '印度', value: '1,100', unit: '億噸', global: '10.3%', country: 'India' },
+                { name: '印尼', value: '400', unit: '億噸', global: '3.5%', country: 'Indonesia' },
+                { name: '德國', value: '350', unit: '億噸', global: '3.3%', country: 'Germany' },
+                { name: '烏克蘭', value: '343', unit: '億噸', global: '3.2%', country: 'Ukraine' },
+                { name: '波蘭', value: '262', unit: '億噸', global: '2.5%', country: 'Poland' },
+                { name: '蒙古', value: '252', unit: '億噸', global: '2.4%', country: 'Mongolia' }
+            ],
+            gold: [
+                { name: '澳洲', value: '12,000', unit: '噸', global: '20%', country: 'Australia' },
+                { name: '俄羅斯', value: '11,000', unit: '噸', global: '18%', country: 'Russia' },
+                { name: '南非', value: '5,000', unit: '噸', global: '8%', country: 'South Africa' },
+                { name: '美國', value: '3,000', unit: '噸', global: '5%', country: 'United States' },
+                { name: '秘魯', value: '2,400', unit: '噸', global: '4%', country: 'Peru' },
+                { name: '印尼', value: '2,600', unit: '噸', global: '4%', country: 'Indonesia' },
+                { name: '巴西', value: '2,400', unit: '噸', global: '4%', country: 'Brazil' },
+                { name: '加拿大', value: '2,200', unit: '噸', global: '3.5%', country: 'Canada' },
+                { name: '中國', value: '3,000', unit: '噸', global: '5%', country: 'China' },
+                { name: '烏茲別克', value: '3,500', unit: '噸', global: '6%', country: 'Uzbekistan' }
+            ],
+            copper: [
+                { name: '智利', value: '1.9', unit: '億噸', global: '23%', country: 'Chile' },
+                { name: '澳洲', value: '1.0', unit: '億噸', global: '12%', country: 'Australia' },
+                { name: '秘魯', value: '0.9', unit: '億噸', global: '11%', country: 'Peru' },
+                { name: '俄羅斯', value: '0.8', unit: '億噸', global: '10%', country: 'Russia' },
+                { name: '墨西哥', value: '0.5', unit: '億噸', global: '6%', country: 'Mexico' },
+                { name: '美國', value: '0.5', unit: '億噸', global: '6%', country: 'United States' },
+                { name: '印尼', value: '0.4', unit: '億噸', global: '5%', country: 'Indonesia' },
+                { name: '中國', value: '0.4', unit: '億噸', global: '5%', country: 'China' },
+                { name: '剛果', value: '0.3', unit: '億噸', global: '4%', country: 'Democratic Republic of the Congo' },
+                { name: '尚比亞', value: '0.2', unit: '億噸', global: '3%', country: 'Zambia' }
+            ],
+            lithium: [
+                { name: '智利', value: '930', unit: '萬噸', global: '31%', country: 'Chile' },
+                { name: '澳洲', value: '620', unit: '萬噸', global: '21%', country: 'Australia' },
+                { name: '阿根廷', value: '360', unit: '萬噸', global: '12%', country: 'Argentina' },
+                { name: '中國', value: '300', unit: '萬噸', global: '10%', country: 'China' },
+                { name: '玻利維亞', value: '230', unit: '萬噸', global: '8%', country: 'Bolivia' },
+                { name: '巴西', value: '95', unit: '萬噸', global: '3%', country: 'Brazil' },
+                { name: '辛巴威', value: '69', unit: '萬噸', global: '2%', country: 'Zimbabwe' },
+                { name: '葡萄牙', value: '60', unit: '萬噸', global: '2%', country: 'Portugal' },
+                { name: '美國', value: '110', unit: '萬噸', global: '4%', country: 'United States' },
+                { name: '加拿大', value: '93', unit: '萬噸', global: '3%', country: 'Canada' }
+            ],
+            nickel: [
+                { name: '印尼', value: '2,100', unit: '萬噸', global: '22%', country: 'Indonesia' },
+                { name: '澳洲', value: '2,000', unit: '萬噸', global: '21%', country: 'Australia' },
+                { name: '巴西', value: '1,600', unit: '萬噸', global: '17%', country: 'Brazil' },
+                { name: '新喀里多尼亞', value: '1,200', unit: '萬噸', global: '12.5%', country: 'New Caledonia' },
+                { name: '俄羅斯', value: '750', unit: '萬噸', global: '8%', country: 'Russia' },
+                { name: '南非', value: '450', unit: '萬噸', global: '5%', country: 'South Africa' },
+                { name: '中國', value: '420', unit: '萬噸', global: '4%', country: 'China' },
+                { name: '加拿大', value: '280', unit: '萬噸', global: '3%', country: 'Canada' },
+                { name: '菲律賓', value: '480', unit: '萬噸', global: '5%', country: 'Philippines' },
+                { name: '美國', value: '160', unit: '萬噸', global: '2%', country: 'United States' }
+            ],
+            diamond: [
+                { name: '俄羅斯', value: '6.5', unit: '億克拉', global: '40%', country: 'Russia' },
+                { name: '波札那', value: '2.9', unit: '億克拉', global: '20%', country: 'Botswana' },
+                { name: '剛果', value: '1.5', unit: '億克拉', global: '10%', country: 'Democratic Republic of the Congo' },
+                { name: '澳洲', value: '1.1', unit: '億克拉', global: '7%', country: 'Australia' },
+                { name: '加拿大', value: '1.0', unit: '億克拉', global: '6%', country: 'Canada' },
+                { name: '納米比亞', value: '0.8', unit: '億克拉', global: '5%', country: 'Namibia' },
+                { name: '南非', value: '0.7', unit: '億克拉', global: '4%', country: 'South Africa' },
+                { name: '安哥拉', value: '0.5', unit: '億克拉', global: '3%', country: 'Angola' },
+                { name: '辛巴威', value: '0.4', unit: '億克拉', global: '3%', country: 'Zimbabwe' },
+                { name: '巴西', value: '0.3', unit: '億克拉', global: '2%', country: 'Brazil' }
+            ],
+            uranium: [
+                { name: '澳洲', value: '168', unit: '萬噸', global: '28%', country: 'Australia' },
+                { name: '哈薩克', value: '81', unit: '萬噸', global: '13%', country: 'Kazakhstan' },
+                { name: '加拿大', value: '58', unit: '萬噸', global: '10%', country: 'Canada' },
+                { name: '俄羅斯', value: '48', unit: '萬噸', global: '8%', country: 'Russia' },
+                { name: '南非', value: '32', unit: '萬噸', global: '5%', country: 'South Africa' },
+                { name: '納米比亞', value: '28', unit: '萬噸', global: '5%', country: 'Namibia' },
+                { name: '尼日', value: '27', unit: '萬噸', global: '4%', country: 'Niger' },
+                { name: '中國', value: '27', unit: '萬噸', global: '4%', country: 'China' },
+                { name: '烏茲別克', value: '13', unit: '萬噸', global: '2%', country: 'Uzbekistan' },
+                { name: '烏克蘭', value: '11', unit: '萬噸', global: '2%', country: 'Ukraine' }
+            ],
+            bauxite: [
+                { name: '幾內亞', value: '74', unit: '億噸', global: '25%', country: 'Guinea' },
+                { name: '澳洲', value: '51', unit: '億噸', global: '17%', country: 'Australia' },
+                { name: '越南', value: '58', unit: '億噸', global: '19%', country: 'Vietnam' },
+                { name: '巴西', value: '27', unit: '億噸', global: '9%', country: 'Brazil' },
+                { name: '中國', value: '10', unit: '億噸', global: '3%', country: 'China' },
+                { name: '印尼', value: '12', unit: '億噸', global: '4%', country: 'Indonesia' },
+                { name: '印度', value: '6.6', unit: '億噸', global: '2%', country: 'India' },
+                { name: '俄羅斯', value: '5.0', unit: '億噸', global: '2%', country: 'Russia' },
+                { name: '牙買加', value: '20', unit: '億噸', global: '7%', country: 'Jamaica' },
+                { name: '哈薩克', value: '1.6', unit: '億噸', global: '0.5%', country: 'Kazakhstan' }
+            ]
+        };
+
+        function updateRanking(type) {
+            const container = document.getElementById('ranking-list');
+            const data = rankingsData[type];
+            
+            if (!data) return;
+            
+            container.innerHTML = data.map((item, index) => `
+                <div onclick="selectCountry('${item.country}')" 
+                    class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700 cursor-pointer transition-colors">
+                    <div class="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold ${index < 3 ? 'text-yellow-400' : 'text-slate-400'}">
+                        ${index + 1}
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-sm font-medium text-white">${item.name}</div>
+                        <div class="text-xs text-slate-400">${item.value} ${item.unit}</div>
+                    </div>
+                    <div class="text-xs text-slate-500">${item.global}</div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize ranking on load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateRanking('oil');
+        });
+
+        // Close search results when clicking outside
+        document.addEventListener('click', (e) => {
+            const searchContainer = document.getElementById('country-search');
+            const resultsContainer = document.getElementById('search-results');
+            if (!searchContainer.contains(e.target) && !resultsContainer.contains(e.target)) {
+                resultsContainer.classList.add('hidden');
+            }
+        });
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
             generateResourceCards();
-            generateTopExporters();
+            updateRanking('oil');
         });
     </script>
 </body>
