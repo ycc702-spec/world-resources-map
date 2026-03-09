@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/topojson@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -87,6 +88,10 @@
                             onkeyup="searchCountries(this.value)">
                         <div id="search-results" class="absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-600 rounded-lg shadow-xl hidden z-50 max-h-60 overflow-y-auto"></div>
                     </div>
+                    <button onclick="toggleCompareMode()" id="compare-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                        <span>📊</span>
+                        <span id="compare-btn-text">比較模式</span>
+                    </button>
                     <button onclick="showAllResources()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition">
                         顯示全部
                     </button>
@@ -223,10 +228,42 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Charts Section -->
+                <div class="glass-panel rounded-2xl p-6 mt-6">
+                    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <span>📈</span> 資源統計圖表
+                    </h2>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <canvas id="resource-type-chart"></canvas>
+                        </div>
+                        <div>
+                            <canvas id="region-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Country Details -->
             <div class="lg:col-span-1">
+                <!-- Compare Panel -->
+                <div id="compare-panel" class="glass-panel rounded-2xl p-6 mb-6 hidden">
+                    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <span>📊</span> 國家比較
+                        <span id="compare-count" class="ml-auto text-sm bg-purple-600 px-2 py-1 rounded-full">0/5</span>
+                    </h2>
+                    <div id="compare-list" class="space-y-2 mb-4">
+                        <!-- Selected countries for comparison -->
+                    </div>
+                    <button onclick="showComparison()" id="show-compare-btn" class="w-full py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        查看比較結果
+                    </button>
+                    <button onclick="clearComparison()" class="w-full mt-2 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition">
+                        清除選擇
+                    </button>
+                </div>
+
                 <div class="glass-panel rounded-2xl p-6">
                     <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
                         <span>📊</span> 國家資源詳情
@@ -1533,7 +1570,13 @@
                         .attr('fill', d => getCountryColor(d.properties.name))
                         .attr('stroke', '#1e293b')
                         .attr('stroke-width', 0.5)
-                        .on('click', (event, d) => showCountryDetails(d.properties.name))
+                        .on('click', (event, d) => {
+                            if (compareMode) {
+                                addToComparison(d.properties.name);
+                            } else {
+                                showCountryDetails(d.properties.name);
+                            }
+                        })
                         .on('mouseover', function(event, d) {
                             d3.select(this).attr('opacity', 0.8);
                             showTooltip(event, d.properties.name);
@@ -2370,11 +2413,302 @@
             }
         });
 
+        // Compare functionality
+        let compareMode = false;
+        let selectedCountries = [];
+        const MAX_COMPARE = 5;
+
+        function toggleCompareMode() {
+            compareMode = !compareMode;
+            const btn = document.getElementById('compare-btn');
+            const btnText = document.getElementById('compare-btn-text');
+            const panel = document.getElementById('compare-panel');
+
+            if (compareMode) {
+                btn.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+                btn.classList.add('bg-green-600', 'hover:bg-green-700');
+                btnText.textContent = '完成選擇';
+                panel.classList.remove('hidden');
+            } else {
+                btn.classList.add('bg-purple-600', 'hover:bg-purple-700');
+                btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                btnText.textContent = '比較模式';
+                panel.classList.add('hidden');
+            }
+        }
+
+        function addToComparison(countryKey) {
+            if (!compareMode) return;
+            if (selectedCountries.includes(countryKey)) return;
+            if (selectedCountries.length >= MAX_COMPARE) {
+                alert(`最多只能比較 ${MAX_COMPARE} 個國家`);
+                return;
+            }
+
+            selectedCountries.push(countryKey);
+            updateComparePanel();
+        }
+
+        function removeFromComparison(countryKey) {
+            selectedCountries = selectedCountries.filter(c => c !== countryKey);
+            updateComparePanel();
+        }
+
+        function updateComparePanel() {
+            const list = document.getElementById('compare-list');
+            const count = document.getElementById('compare-count');
+            const btn = document.getElementById('show-compare-btn');
+
+            count.textContent = `${selectedCountries.length}/${MAX_COMPARE}`;
+
+            if (selectedCountries.length === 0) {
+                list.innerHTML = '<div class="text-slate-400 text-sm text-center py-4">點擊地圖上的國家添加</div>';
+                btn.disabled = true;
+            } else {
+                list.innerHTML = selectedCountries.map(key => {
+                    const data = resourceData[key];
+                    return `
+                        <div class="flex items-center justify-between p-2 bg-slate-800 rounded-lg">
+                            <div class="flex items-center gap-2">
+                                <span style="color: ${data.color || '#94a3b8'}">●</span>
+                                <span class="text-sm text-white">${data.name}</span>
+                            </div>
+                            <button onclick="removeFromComparison('${key}')" class="text-red-400 hover:text-red-300 text-sm">✕</button>
+                        </div>
+                    `;
+                }).join('');
+                btn.disabled = selectedCountries.length < 2;
+            }
+        }
+
+        function clearComparison() {
+            selectedCountries = [];
+            updateComparePanel();
+        }
+
+        function showComparison() {
+            if (selectedCountries.length < 2) return;
+
+            const container = document.getElementById('country-details');
+            const countriesData = selectedCountries.map(key => resourceData[key]);
+
+            // Generate comparison table
+            const resources = ['oil', 'gas', 'coal', 'gold', 'copper', 'lithium', 'nickel'];
+            const resourceLabels = {
+                oil: '石油 (十億桶)',
+                gas: '天然氣 (兆立方英尺)',
+                coal: '煤炭 (億噸)',
+                gold: '黃金 (噸)',
+                copper: '銅礦 (萬噸)',
+                lithium: '鋰礦 (萬噸)',
+                nickel: '鎳礦 (萬噸)'
+            };
+
+            container.innerHTML = `
+                <div class="border-b border-slate-700 pb-4 mb-4">
+                    <h3 class="text-xl font-bold text-white">📊 國家比較</h3>
+                    <p class="text-slate-400 text-sm mt-1">${countriesData.length} 個國家資源對比</p>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-700">
+                                <th class="text-left py-2 text-slate-400">資源類型</th>
+                                ${countriesData.map(c => `
+                                    <th class="text-center py-2 text-white" style="color: ${c.color}">${c.name}</th>
+                                `).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${resources.map(res => `
+                                <tr class="border-b border-slate-700/50">
+                                    <td class="py-2 text-slate-400">${resourceLabels[res]}</td>
+                                    ${countriesData.map(c => {
+                                        const value = getResourceValue(c, res);
+                                        return `<td class="text-center py-2 ${value ? 'text-white' : 'text-slate-600'}">${value || '-'}</td>`;
+                                    }).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-slate-700/50">
+                    <canvas id="compare-chart"></canvas>
+                </div>
+
+                <button onclick="clearComparison(); toggleCompareMode();" class="w-full mt-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition">
+                    返回正常模式
+                </button>
+            `;
+
+            // Create comparison chart
+            createComparisonChart(countriesData, resources);
+        }
+
+        function getResourceValue(data, resource) {
+            const values = {
+                oil: data.oilReserves,
+                gas: data.gasReserves,
+                coal: data.coalReserves,
+                gold: data.goldReserves,
+                copper: data.copperReserves,
+                lithium: data.lithiumReserves,
+                nickel: data.nickelReserves
+            };
+            return values[resource] || null;
+        }
+
+        function createComparisonChart(countriesData, resources) {
+            const ctx = document.getElementById('compare-chart');
+            if (!ctx) return;
+
+            const datasets = countriesData.map((country, index) => ({
+                label: country.name,
+                data: resources.map(res => {
+                    const val = getResourceValue(country, res);
+                    return val ? parseFloat(val.replace(/,/g, '')) : 0;
+                }),
+                backgroundColor: country.color + '80',
+                borderColor: country.color,
+                borderWidth: 2
+            }));
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['石油', '天然氣', '煤炭', '黃金', '銅礦', '鋰礦', '鎳礦'],
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#94a3b8' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: '#334155' }
+                        },
+                        x: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: '#334155' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Charts functionality
+        function initCharts() {
+            // Resource type distribution chart
+            const resourceTypeCtx = document.getElementById('resource-type-chart');
+            if (resourceTypeCtx) {
+                const resourceCounts = {};
+                Object.values(resourceData).forEach(data => {
+                    data.resources.forEach(res => {
+                        resourceCounts[res] = (resourceCounts[res] || 0) + 1;
+                    });
+                });
+
+                new Chart(resourceTypeCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['石油', '天然氣', '煤炭', '礦產', '稀土', '黃金', '其他'],
+                        datasets: [{
+                            data: [
+                                resourceCounts['oil'] || 0,
+                                resourceCounts['gas'] || 0,
+                                resourceCounts['coal'] || 0,
+                                resourceCounts['mineral'] || 0,
+                                resourceCounts['rare'] || 0,
+                                resourceCounts['gold'] || 0,
+                                (resourceCounts['lithium'] || 0) + (resourceCounts['nickel'] || 0) + (resourceCounts['diamond'] || 0)
+                            ],
+                            backgroundColor: [
+                                '#dc2626', '#f59e0b', '#374151', '#7c3aed',
+                                '#06b6d4', '#eab308', '#94a3b8'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { color: '#94a3b8', font: { size: 10 } }
+                            },
+                            title: {
+                                display: true,
+                                text: '資源類型分布',
+                                color: '#e2e8f0'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Region distribution chart
+            const regionCtx = document.getElementById('region-chart');
+            if (regionCtx) {
+                const regions = {
+                    '中東': ['Saudi Arabia', 'Iran', 'Iraq', 'Kuwait', 'UAE', 'Qatar'],
+                    '歐洲': ['Russia', 'Norway', 'United Kingdom', 'Sweden', 'Poland', 'Germany'],
+                    '亞洲': ['China', 'India', 'Indonesia', 'Kazakhstan', 'Mongolia'],
+                    '北美': ['United States', 'Canada'],
+                    '南美': ['Brazil', 'Venezuela', 'Chile', 'Peru', 'Argentina'],
+                    '非洲': ['South Africa', 'Nigeria', 'Libya', 'Algeria', 'Egypt'],
+                    '大洋洲': ['Australia']
+                };
+
+                const regionCounts = Object.entries(regions).map(([region, countries]) => {
+                    return countries.filter(c => resourceData[c]).length;
+                });
+
+                new Chart(regionCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(regions),
+                        datasets: [{
+                            label: '國家數量',
+                            data: regionCounts,
+                            backgroundColor: '#3b82f6'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false },
+                            title: {
+                                display: true,
+                                text: '各地區資源國分布',
+                                color: '#e2e8f0'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                ticks: { color: '#94a3b8' },
+                                grid: { color: '#334155' }
+                            },
+                            x: {
+                                ticks: { color: '#94a3b8' },
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
             generateResourceCards();
             updateRanking('oil');
+            initCharts();
         });
     </script>
 </body>
