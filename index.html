@@ -64,6 +64,44 @@
             z-index: 1000;
             max-width: 300px;
         }
+
+        /* Light theme styles */
+        body.light-theme {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
+            color: #1e293b;
+        }
+        body.light-theme .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        body.light-theme #country-search {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: #1e293b;
+        }
+        body.light-theme #search-results {
+            background: #ffffff;
+            border-color: #cbd5e1;
+        }
+        body.light-theme .text-slate-400 { color: #64748b; }
+        body.light-theme .text-slate-500 { color: #6b7280; }
+        body.light-theme .text-slate-300 { color: #475569; }
+        body.light-theme .bg-slate-700 { background-color: #e2e8f0; }
+        body.light-theme .bg-slate-800 { background-color: #f1f5f9; }
+        body.light-theme .bg-slate-900 { background-color: #f8fafc; }
+        body.light-theme .border-slate-700 { border-color: #cbd5e1; }
+        body.light-theme .border-slate-600 { border-color: #cbd5e1; }
+        body.light-theme .text-white { color: #1e293b; }
+        body.light-theme h1 {
+            background: linear-gradient(to right, #2563eb, #0891b2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        body.light-theme .tooltip {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #1e293b;
+        }
     </style>
 </head>
 <body class="text-white">
@@ -81,6 +119,10 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()" id="theme-btn" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition" title="切換主題">
+                        <span id="theme-icon">🌙</span>
+                    </button>
                     <!-- Search Box -->
                     <div class="relative">
                         <input type="text" id="country-search" placeholder="🔍 搜尋國家..." 
@@ -2603,7 +2645,17 @@
         }
 
         // Charts functionality
+        let charts = {};
+
         function initCharts() {
+            const textColor = isDarkTheme ? '#94a3b8' : '#475569';
+            const titleColor = isDarkTheme ? '#e2e8f0' : '#1e293b';
+            const gridColor = isDarkTheme ? '#334155' : '#e2e8f0';
+
+            // Destroy existing charts
+            Object.values(charts).forEach(chart => chart.destroy());
+            charts = {};
+
             // Resource type distribution chart
             const resourceTypeCtx = document.getElementById('resource-type-chart');
             if (resourceTypeCtx) {
@@ -2614,7 +2666,7 @@
                     });
                 });
 
-                new Chart(resourceTypeCtx, {
+                charts.resourceType = new Chart(resourceTypeCtx, {
                     type: 'doughnut',
                     data: {
                         labels: ['石油', '天然氣', '煤炭', '礦產', '稀土', '黃金', '其他'],
@@ -2639,12 +2691,12 @@
                         plugins: {
                             legend: {
                                 position: 'bottom',
-                                labels: { color: '#94a3b8', font: { size: 10 } }
+                                labels: { color: textColor, font: { size: 10 } }
                             },
                             title: {
                                 display: true,
                                 text: '資源類型分布',
-                                color: '#e2e8f0'
+                                color: titleColor
                             }
                         }
                     }
@@ -2668,7 +2720,7 @@
                     return countries.filter(c => resourceData[c]).length;
                 });
 
-                new Chart(regionCtx, {
+                charts.region = new Chart(regionCtx, {
                     type: 'bar',
                     data: {
                         labels: Object.keys(regions),
@@ -2685,16 +2737,16 @@
                             title: {
                                 display: true,
                                 text: '各地區資源國分布',
-                                color: '#e2e8f0'
+                                color: titleColor
                             }
                         },
                         scales: {
                             y: {
-                                ticks: { color: '#94a3b8' },
-                                grid: { color: '#334155' }
+                                ticks: { color: textColor },
+                                grid: { color: gridColor }
                             },
                             x: {
-                                ticks: { color: '#94a3b8' },
+                                ticks: { color: textColor },
                                 grid: { display: false }
                             }
                         }
@@ -2703,8 +2755,49 @@
             }
         }
 
+        // Theme toggle functionality
+        let isDarkTheme = true;
+
+        function toggleTheme() {
+            isDarkTheme = !isDarkTheme;
+            const body = document.body;
+            const themeIcon = document.getElementById('theme-icon');
+            const themeBtn = document.getElementById('theme-btn');
+
+            if (isDarkTheme) {
+                body.classList.remove('light-theme');
+                themeIcon.textContent = '🌙';
+                themeBtn.title = '切換淺色主題';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.add('light-theme');
+                themeIcon.textContent = '☀️';
+                themeBtn.title = '切換深色主題';
+                localStorage.setItem('theme', 'light');
+            }
+
+            // Update charts for new theme
+            updateChartsTheme();
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                isDarkTheme = false;
+                document.body.classList.add('light-theme');
+                document.getElementById('theme-icon').textContent = '☀️';
+                document.getElementById('theme-btn').title = '切換深色主題';
+            }
+        }
+
+        function updateChartsTheme() {
+            // Re-initialize charts with new theme colors
+            initCharts();
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
+            loadTheme();
             initMap();
             generateResourceCards();
             updateRanking('oil');
